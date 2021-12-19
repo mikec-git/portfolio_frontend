@@ -11,27 +11,27 @@ import c from './About.module.scss';
 import * as u from '../../Shared/utility';
 
 class About extends Component {
-  state = { 
+  state = {
     animating: false,
     pageState: 'about'
   };
-    
+
   aboutRef          = React.createRef();
   aboutContentRef   = React.createRef();
-  contactRef        = React.createRef();
+  // contactRef        = React.createRef();
   contactLinksRef   = React.createRef();
-  toggleTopRef      = React.createRef();
-  toggleBottomRef   = React.createRef();
+  // toggleTopRef      = React.createRef();
+  // toggleBottomRef   = React.createRef();
 
   componentDidMount() {
     this.aboutEl          = this.aboutRef.current;
     this.aboutContentEl   = this.aboutContentRef.current;
-    this.contactEl        = this.contactRef.current;
+    // this.contactEl        = this.contactRef.current;
     this.contactLinksEl   = this.contactLinksRef.current;
-    this.toggleTopEl      = this.toggleTopRef.current;
-    this.toggleBottomEl   = this.toggleBottomRef.current;
-    
-    this._isMounted   = true;    
+    // this.toggleTopEl      = this.toggleTopRef.current;
+    // this.toggleBottomEl   = this.toggleBottomRef.current;
+
+    this._isMounted   = true;
     const appearAnim  = this.props.routeAnim.appear;
 
     // This indicates route wasnt loaded initially by client, but instead arriving from another route
@@ -48,7 +48,7 @@ class About extends Component {
       .to(this.aboutEl, 0.5, {autoAlpha: 0, ease: Power2.easeOut}, 0);
 
     // Initially set contact page to be invisible
-    TweenMax.set(this.contactEl, {autoAlpha: 0});
+    // TweenMax.set(this.contactEl, {autoAlpha: 0});
   }
 
   componentWillUnmount() {
@@ -57,13 +57,13 @@ class About extends Component {
     this.props.removeFocus();
     this.removeEvents();
   }
-  
+
   componentDidUpdate(prevProps) {
     const { page, routeAnim: { leave: leaveAnim }, navIsOpen } = this.props;
     const { page: prevPage, routeAnim: { leave: prevLeaveAnim }, navIsOpen: prevNavIsOpen } = prevProps;
 
     // Leave route if page changed
-    if(!_.isEqual(page[0], prevPage[0]) && this._isMounted) { 
+    if(!_.isEqual(page[0], prevPage[0]) && this._isMounted) {
       this.setState({ animating: true }, this[leaveAnim]);
     }
 
@@ -76,7 +76,7 @@ class About extends Component {
     }
   }
 
-  addEvents() {    
+  addEvents() {
     this.debouncedResize = _.debounce(this.onPageResize, 400, {
       'leading': false,
       'trailing': true
@@ -87,17 +87,17 @@ class About extends Component {
     window.addEventListener('resize', this.debouncedResize);
   }
 
-  removeEvents() {    
+  removeEvents() {
     window.removeEventListener('wheel', this.mouseScrollHandler);
     window.removeEventListener('resize', this.debouncedResize);
   }
-  
+
   // When component leave anim finished...
   onCompleteHandlerLeave = () => {
     this.props.animationCallback();
     this._isMounted && this.setState({ animating: false });
   }
-  
+
   // When component arrive anim finished...
   onCompleteHandlerArrive = () => {
     this._isMounted && this.setState({ animating: false });
@@ -124,12 +124,12 @@ class About extends Component {
         }
       }
     };
-    
+
     this.tl
       .set(this.aboutContentEl, {...params[direction].main.set})
       .set(this.contactLinksEl, {autoAlpha: 0}, 0)
       .set(this.toggleBottomEl, {autoAlpha: 0}, 0)
-      
+
       .delay(.5)
       .to(this.aboutContentEl, 0.8, {...params[direction].main.to, ease: Expo.easeOut}, 0)
       .to(this.aboutContentEl, 0.8, {autoAlpha: 1, ease: Expo.easeIn}, 0)
@@ -146,24 +146,24 @@ class About extends Component {
         main: {z: -400}
       }
     };
-    
+
     this.tl
       .to(this.aboutContentEl, 0.8, {...params[direction].main, ease: Expo.easeIn}, 0)
       .to(this.aboutContentEl, 1.25, {...autoAlphaEaseOut}, 0);
-      
+
       if(this.state.pageState === 'about') {
         this.tl
           .staggerTo(this.aboutContentEl.children, 0.8, {z: -400, ease: Expo.easeIn}, 0, 0)
           .to(this.contactLinksEl, 0.75, {...autoAlphaEaseOut}, 0)
           .to(this.toggleBottomEl, 1, {...autoAlphaEaseOut}, 0);
       } else {
-        this.tl
-          .to(this.contactEl, 0.8, {...params[direction].main, ease: Expo.easeIn},0)
-          .to(this.contactEl, 1, {...autoAlphaEaseOut},0)
-          .to(this.toggleTopEl, 0.8, {...autoAlphaEaseOut}, 0);
+        // this.tl
+        //   .to(this.contactEl, 0.8, {...params[direction].main, ease: Expo.easeIn},0)
+        //   .to(this.contactEl, 1, {...autoAlphaEaseOut},0)
+        //   .to(this.toggleTopEl, 0.8, {...autoAlphaEaseOut}, 0);
     }
   }
-  
+
   appearOut = () => {
     this.appearTweens('out');
   }
@@ -171,44 +171,44 @@ class About extends Component {
   leaveIn = () => {
     this.leaveTweens('in');
   }
-  
+
   // Initializes new slide timeline each time it is run...
   initSlide = () => {
     this._isSliding = true;
     this.slideTl && this.slideTl.clear();
     this.slideTl = new TimelineMax();
   }
-  
+
   // Slides page up to reveal contact page...
   slideUp = () => {
     this.winHeight = window.innerHeight;
-    this.initSlide();
-    this.slideTl
-      .to(this.toggleBottomEl, 0.15, {autoAlpha: 0}, 0)
-      .to(this.aboutContentEl, 1, {y: -this.winHeight, autoAlpha: 0, ease: Power4.easeInOut}, 0)
-      .to(this.contactEl, 1, {y: -this.winHeight, autoAlpha: 1, ease: Power4.easeInOut}, 0)
-      .call(() => this._isMounted && this.setState({ pageState: 'contact' }))
-      .call(() => (this._isSliding = false))
-      .set(this.toggleBottomEl, {autoAlpha: 0})
-      .to(this.toggleTopEl, 1, {autoAlpha: 1});
+    // this.initSlide();
+    // this.slideTl
+    //   .to(this.toggleBottomEl, 0.15, {autoAlpha: 0}, 0)
+    //   .to(this.aboutContentEl, 1, {y: -this.winHeight, autoAlpha: 0, ease: Power4.easeInOut}, 0)
+    //   .to(this.contactEl, 1, {y: -this.winHeight, autoAlpha: 1, ease: Power4.easeInOut}, 0)
+    //   .call(() => this._isMounted && this.setState({ pageState: 'contact' }))
+    //   .call(() => (this._isSliding = false))
+    //   .set(this.toggleBottomEl, {autoAlpha: 0})
+    //   .to(this.toggleTopEl, 1, {autoAlpha: 1});
   }
-  
+
   // Slides page down to reveal about page...
   slideDown = () => {
     this.winHeight = window.innerHeight;
-    this.initSlide();
-      this.slideTl
-        .to(this.toggleTopEl, 0.15, {autoAlpha: 0}, 0)
-        .to(this.aboutContentEl, 1, {y: 0, autoAlpha: 1, ease: Power4.easeInOut}, 0)
-        .to(this.contactEl, 1, {y: 0, autoAlpha: 0, ease: Power4.easeInOut}, 0)
-        .call(() => this._isMounted && this.setState({ pageState: 'about' }))
-        .call(() => (this._isSliding = false))
-        .set(this.toggleTopEl, {autoAlpha: 0})
-        .to(this.toggleBottomEl, 1, {autoAlpha: 1});
+    // this.initSlide();
+    //   this.slideTl
+    //     .to(this.toggleTopEl, 0.15, {autoAlpha: 0}, 0)
+    //     .to(this.aboutContentEl, 1, {y: 0, autoAlpha: 1, ease: Power4.easeInOut}, 0)
+    //     .to(this.contactEl, 1, {y: 0, autoAlpha: 0, ease: Power4.easeInOut}, 0)
+    //     .call(() => this._isMounted && this.setState({ pageState: 'about' }))
+    //     .call(() => (this._isSliding = false))
+    //     .set(this.toggleTopEl, {autoAlpha: 0})
+    //     .to(this.toggleBottomEl, 1, {autoAlpha: 1});
   }
 
   // Toggles state of page...
-  togglePageStateHander = () => {    
+  togglePageStateHander = () => {
     if(!this.props.navIsOpen && u.isWindowDesktop()) {
       // If on about page...
       if(this.state.pageState === 'about') {
@@ -227,26 +227,26 @@ class About extends Component {
   mouseScrollHandler = (e) => {
     if(!this._isSliding && !this.props.navIsOpen && u.isWindowDesktop()) {
       this.winHeight = window.innerHeight;
-      
+
       if(e.deltaY > 0 && this.state.pageState === 'about') {
         this.slideUp();
         this.props.addFocus();
       } else if(e.deltaY < 0 && this.state.pageState === 'contact') {
         this.slideDown();
-        this.props.removeFocus();        
+        this.props.removeFocus();
       }
     }
   }
-  
+
   onPageResize = () => {
     TweenMax.set(this.toggleTopEl, {clearProps: 'all'});
     TweenMax.set(this.toggleBottomEl, {clearProps: 'all'});
     TweenMax.set(this.aboutContentEl, {clearProps: 'all'});
-    TweenMax.set(this.contactEl, {clearProps: 'all'});
+    // TweenMax.set(this.contactEl, {clearProps: 'all'});
 
     if(this.state.pageState === 'about') {
       this.slideDown();
-    } else if(this.state.pageState === 'contact' && u.isWindowDesktop()) {      
+    } else if(this.state.pageState === 'contact' && u.isWindowDesktop()) {
       this.slideUp();
     }
   }
@@ -259,19 +259,19 @@ class About extends Component {
           contactLinksRef={this.contactLinksRef}
           animating={this.state.animating}
           images={this.props.images} />
-        <Contact 
+        {/* <Contact
           elementRef={this.contactRef}
           animating={this.state.animating}
-          pageState={this.state.pageState} />
-        <ToggleBtn 
+          pageState={this.state.pageState} /> */}
+        {/* <ToggleBtn
           position='top'
           elementRef={this.toggleTopRef}
           pageState={this.state.pageState}
           togglePageState={this.togglePageStateHander} />
-        <ToggleBtn 
+        <ToggleBtn
           position='bottom'
           elementRef={this.toggleBottomRef}
-          togglePageState={this.togglePageStateHander} />
+          togglePageState={this.togglePageStateHander} /> */}
       </div>
     );
   }
@@ -288,8 +288,8 @@ About.propTypes = {
 
 const mapStateToProps = state => {
   return {
-    images: state.ui.images   
+    images: state.ui.images
   }
 }
- 
+
 export default connect(mapStateToProps, null)(About);

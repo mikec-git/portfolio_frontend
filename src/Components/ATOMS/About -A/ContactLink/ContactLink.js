@@ -8,10 +8,10 @@ const contactLink = (props) => {
   let url = resume;
   let target = '_blank';
   let rel = "noopener noreferrer";
-  
+
   if(linkType === 'GitHub') {
     url = 'https://github.com/mikec-git';
-  } else if(linkType === 'linkedIn') {
+  } else if(linkType === 'LinkedIn') {
     url = 'https://www.linkedin.com/in/choi-mike/';
   } else if(linkType === 'CodePen') {
     url = 'https://codepen.io/mikec-git/';
@@ -20,18 +20,18 @@ const contactLink = (props) => {
     target = null;
     rel = null;
   }
-  
+
   let link = (
-    <img 
+    <img
       className={c.ContactLink__Image}
-      src={props.imgSrc} 
+      src={props.imgSrc}
       alt={linkType} />
   );
 
   return (
-    <a 
-      className={c.ContactLink} 
-      href={url} 
+    <a
+      className={c.ContactLink}
+      href={url}
       target={target}
       rel={rel}>
       {link}
@@ -39,7 +39,7 @@ const contactLink = (props) => {
     </a>
   );
 }
- 
+
 contactLink.propTypes = {
   imgSrc: PropTypes.string.isRequired,
   imgAlt: PropTypes.string.isRequired

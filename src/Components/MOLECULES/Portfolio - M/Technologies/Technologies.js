@@ -13,13 +13,21 @@ const technologies = (props) => {
 
   // If techlist provided and images loaded...
   if(props.techList && imagesLoaded) {
-    technologies = props.techList.map(tech => {   
+    technologies = props.techList.map(tech => {
       let skillName = u.getTechnologyName(tech);
+      let src = null;
+      try {
+        src = props.images[tech].src;
+      }
+      catch (e) {
+        return null
+      }
+
       return (
         <Tech
           key={tech}
           techName={skillName}
-          imgSrc={props.images[tech].src}
+          imgSrc={src}
           imgAlt={skillName} />
       );
     });
@@ -44,5 +52,5 @@ const mapStateToProps = state => {
     images: state.ui.images
   }
 }
- 
+
 export default connect(mapStateToProps, null)(technologies);
