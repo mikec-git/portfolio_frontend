@@ -1,0 +1,81 @@
+// ALCUBIERRE
+@font-face {
+  font-family: 'Alcubierre';
+  src: local('Alcubierre'), url('./Assets/fonts/Alcubierre.otf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+// CODE
+@font-face {
+  font-family: 'Code';
+  src: local('Code Bold'), url('./Assets/fonts/Code-Bold.otf');
+  font-weight: bold;
+  font-style: bold;
+}
+
+@font-face {
+  font-family: 'Code';
+  src: local('Code Light'), url('./Assets/fonts/Code-Light.otf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+// BLANCH
+@font-face {
+  font-family: 'Blanch';
+  src: local('Blanch'), url('./Assets/fonts/Blanch/BLANCH_CONDENSED.otf');
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'Blanch';
+  src: local('Blanch Light'), url('./Assets/fonts/Blanch/BLANCH_CONDENSED_LIGHT.otf');
+  font-weight: 300;
+}
+
+@font-face {
+  font-family: 'Blanch Caps';
+  src: local('Blanch Caps'), url('./Assets/fonts/Blanch/BLANCH_CAPS.otf');
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'Blanch Caps';
+  src: local('Blanch Caps Light'), url('./Assets/fonts/Blanch/BLANCH_CAPS_LIGHT.otf');
+  font-weight: 300;
+}
+
+@font-face {
+  font-family: 'Blanch Caps Inline';
+  src: local('Blanch Caps Inline'), url('./Assets/fonts/Blanch/BLANCH_CAPS_INLINE.otf');
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'Blanch Inline';
+  src: local('Blanch Inline'), url('./Assets/fonts/Blanch/BLANCH_CONDENSED_INLINE.otf');
+  font-weight: 400;
+}
+
+// MOHAVE
+@font-face {
+  font-family: 'Mohave';
+  src: local('Mohave Light'), url('./Assets/fonts/Mohave-Light.otf');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Mohave';
+  src: local('Mohave Medium'), url('./Assets/fonts/Mohave-Medium.otf');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Mohave';
+  src: local('Mohave Bold'), url('./Assets/fonts/Mohave-Bold.otf');
+  font-weight: 600;
+  font-style: bold;
+}
