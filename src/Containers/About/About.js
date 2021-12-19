@@ -128,13 +128,13 @@ class About extends Component {
     this.tl
       .set(this.aboutContentEl, {...params[direction].main.set})
       .set(this.contactLinksEl, {autoAlpha: 0}, 0)
-      .set(this.toggleBottomEl, {autoAlpha: 0}, 0)
+      // .set(this.toggleBottomEl, {autoAlpha: 0}, 0)
 
       .delay(.5)
       .to(this.aboutContentEl, 0.8, {...params[direction].main.to, ease: Expo.easeOut}, 0)
       .to(this.aboutContentEl, 0.8, {autoAlpha: 1, ease: Expo.easeIn}, 0)
       .to(this.contactLinksEl, 0.5, {autoAlpha: 1, ease: Expo.easeIn}, 0.65 + 0.3)
-      .to(this.toggleBottomEl, 1, {autoAlpha: 1, ease: Expo.easeIn});
+      // .to(this.toggleBottomEl, 1, {autoAlpha: 1, ease: Expo.easeIn});
   }
 
   // Leave animation during route change...
@@ -155,7 +155,7 @@ class About extends Component {
         this.tl
           .staggerTo(this.aboutContentEl.children, 0.8, {z: -400, ease: Expo.easeIn}, 0, 0)
           .to(this.contactLinksEl, 0.75, {...autoAlphaEaseOut}, 0)
-          .to(this.toggleBottomEl, 1, {...autoAlphaEaseOut}, 0);
+          // .to(this.toggleBottomEl, 1, {...autoAlphaEaseOut}, 0);
       } else {
         // this.tl
         //   .to(this.contactEl, 0.8, {...params[direction].main, ease: Expo.easeIn},0)
@@ -239,8 +239,8 @@ class About extends Component {
   }
 
   onPageResize = () => {
-    TweenMax.set(this.toggleTopEl, {clearProps: 'all'});
-    TweenMax.set(this.toggleBottomEl, {clearProps: 'all'});
+    // TweenMax.set(this.toggleTopEl, {clearProps: 'all'});
+    // TweenMax.set(this.toggleBottomEl, {clearProps: 'all'});
     TweenMax.set(this.aboutContentEl, {clearProps: 'all'});
     // TweenMax.set(this.contactEl, {clearProps: 'all'});
 
