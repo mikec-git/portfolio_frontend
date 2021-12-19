@@ -10,21 +10,21 @@ import c from './Portfolio.module.scss';
 import { TweenMax, Expo, Power2 } from 'gsap';
 
 class Portfolio extends Component {
-  state = { 
+  state = {
     animating: true,
     pageAnimationCallback: null,
     curProject: slides.portfolio[0].projectId,
     showProjectIndex: slides.portfolio[0].projectId - 1,
     scrollAmount: 0
   };
-  
+
   pageIndicatorRef  = React.createRef();
   maxProjectId      = slides.portfolio.length;
   slides            = slides.portfolio;
 
   componentDidMount() {
     this.pageIndicatorEl = this.pageIndicatorRef.current;
-    this._isMounted = true;    
+    this._isMounted = true;
 
     if(!this.props.routeAnim.appear) {
       this.setState({ animating: false });
@@ -44,16 +44,16 @@ class Portfolio extends Component {
       id:   { from: null, to: null },
       anim: { leave: null, appear: null }
     };
-    
+
     this.props.changeAnimatingProject(animatingProject);
     this.removeEvents();
   }
 
   componentDidUpdate(prevProps) {
     const { animationCallback, scrollAmount, navIsOpen, routeAnim } = this.props;
-    const { 
-      animationCallback: prevAnimCallback, 
-      scrollAmount: prevScrollAmount, 
+    const {
+      animationCallback: prevAnimCallback,
+      scrollAmount: prevScrollAmount,
       navIsOpen: prevNavIsOpen,
       routeAnim: prevRouteAnim } = prevProps;
 
@@ -91,7 +91,7 @@ class Portfolio extends Component {
         const newScroll = sign + this.props.scrollAmount;
         this.props.changeScroll(newScroll);
       }
-      
+
       // Down -> leave left | Up -> leave right
       if(this.projectScrollAmount > 300) {
         this.resetScrollAndInitiateLeave('down');
@@ -105,7 +105,7 @@ class Portfolio extends Component {
   arrowkeyPressedHandler = (e, code) => {
     if(!this.props.navIsOpen) {
       const keyCode = code || e.keyCode;
-      
+
       // Project slides out left
       if(keyCode === 39 || keyCode === 40) {
         this.resetScrollAndInitiateLeave('down');
@@ -115,7 +115,7 @@ class Portfolio extends Component {
       }
     }
   }
-  
+
   // Resets scrolled amount in state and leaves current project...
   resetScrollAndInitiateLeave = (direction) => {
     const curId = this.state.curProject;
@@ -138,16 +138,16 @@ class Portfolio extends Component {
 
     toId = toId ? +toId : null;
     const fromId = this.state.curProject;
-    
+
     if(!this.state.animating && toId !== fromId && this._isMounted) {
       const dir       = toId > fromId ? 'down' : 'up';
       const scrollDir = direction || dir;
-      
+
       this.projectAnimation = u.projectAnimationStyle(fromId, toId, scrollDir);
 
-      const animatingProject = { 
-        id:   { from: fromId, to: toId }, 
-        anim: {...this.projectAnimation} 
+      const animatingProject = {
+        id:   { from: fromId, to: toId },
+        anim: {...this.projectAnimation}
       };
 
       this.props.changeAnimatingProject(animatingProject);
@@ -170,7 +170,7 @@ class Portfolio extends Component {
       id:   { from: null, to: null },
       anim: { leave: null, appear: null }
     };
-    
+
     this.props.changeAnimatingProject(animatingProject);
     this._isMounted && this.setState({ animating: false });
   }
@@ -198,13 +198,13 @@ class Portfolio extends Component {
     }
 
     const visibleProject = projects[this.state.showProjectIndex];
-    
+
     return (
       <>
         <div className={c.Portfolio}>
           {visibleProject}
         </div>
-        <PageIndicator 
+        <PageIndicator
           elementRef={this.pageIndicatorRef}
           numOfSlides={projects.length}
           animating={this.state.animating}

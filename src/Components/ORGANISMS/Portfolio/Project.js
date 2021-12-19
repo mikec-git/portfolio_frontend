@@ -17,10 +17,10 @@ import * as u from '../../../Shared/utility';
 import c from './Project.module.scss';
 
 class Project extends Component {
-  state = { 
+  state = {
     animating: false
   };
-  
+
   projectRef      = React.createRef();
   projectTextRef  = React.createRef();
   bgImageRef      = React.createRef();
@@ -44,17 +44,17 @@ class Project extends Component {
     this.yearEl         = this.yearRef.current;
     this.descriptionEl  = this.descriptionRef.current;
     this.roleEl         = this.roleRef.current;
-    this.mainChildren   = this.titleMainEl.children;  
+    this.mainChildren   = this.titleMainEl.children;
     this.codeBtnEl      = this.codeBtnRef.current;
     this.projectBtnEl   = this.projectBtnRef.current;
     this.techEl         = this.techRef.current;
     this.bgImagesEl     = this.bgImagesRef.current;
-    
+
     this.routeChanged = false;
     this._isMounted   = true;
     this.winHeight    = window.innerHeight;
     this.winWidth     = window.innerWidth;
-    
+
     const yearColorElements = [this.yearEl, this.roleEl, this.techEl];
     TweenMax.set(this.titleMainEl, {color: this.props.fontColor});
     TweenMax.set(this.descriptionEl, {color: this.props.descColor});
@@ -63,7 +63,7 @@ class Project extends Component {
 
     const appearAnim    = this.props.routeAnim.appear;
     const { id, anim }  = this.props.animatingProject;
-    
+
     // Create leave and appear tweens for route/project changes...
     this.tlLeave  = new TimelineMax({onComplete: this.props.onFinishLeave});
     this.tlAppear = new TimelineMax({onComplete: this.onCompleteHandlerAppear});
@@ -78,13 +78,13 @@ class Project extends Component {
     } else if(!this.props.navIsOpen) {
       this.addMouseMove();
     }
-      
+
     // Custom zoom in/out animation...
     this.zoomTweens = new TimelineMax({paused: true});
     this.zoomTweens
       .to(this.projectTextEl, .25, {autoAlpha: 0, ease: Power2.easeInOut})
       .to(this.bgImagesEl, .65, {left: '50%', top: '50%', ease: Power2.easeInOut}, '-=0.5');
-      
+
     this.addEvents();
   }
 
@@ -95,9 +95,9 @@ class Project extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { 
-      projectScrollAmount: projScrollAmt, 
-      animatingProject: { id: animProjectId, anim }, 
+    const {
+      projectScrollAmount: projScrollAmt,
+      animatingProject: { id: animProjectId, anim },
       routeAnim: { leave: leaveAnim },
       page,
       navIsOpen,
@@ -105,11 +105,11 @@ class Project extends Component {
       animating
     } = this.props;
 
-    const { 
-      projectScrollAmount: prevProjScrollAmt, 
+    const {
+      projectScrollAmount: prevProjScrollAmt,
       routeAnim: { leave: prevLeaveAnim },
-      page: prevPage, 
-      navIsOpen: prevNavIsOpen 
+      page: prevPage,
+      navIsOpen: prevNavIsOpen
     } = prevProps;
 
     const routeChanged  = !_.isEqual(page[0], prevPage[0]);
@@ -128,15 +128,15 @@ class Project extends Component {
     if(!this.bgImage && this.bgImageRef.current) {
       this.bgImage = this.bgImageRef.current;
     }
-    
+
     if(!this.bgSubImage && this.bgSubImageRef.current) {
       this.bgSubImage  = this.bgSubImageRef.current;
     }
 
     if(!this.shape && this.bgImageShapeRef.current) {
       this.shape = this.bgImageShapeRef.current;
-    }   
-    
+    }
+
     if(this._isMounted) {
       // If the route is changing...
       if(routeChanged) {
@@ -160,7 +160,7 @@ class Project extends Component {
   }
 
   addEvents() {
-    this.debouncedResize = _.debounce(this.onPageResize, 400, {      
+    this.debouncedResize = _.debounce(this.onPageResize, 400, {
       'leading': false,
       'trailing': true
     });
@@ -182,7 +182,7 @@ class Project extends Component {
     this.hammer.off('swipeleft', this.swipeLeftFunc);
     this.hammer.destroy();
   }
-  
+
   onProjectScrolling = (scroll) => {
     // Scrolls project contents with background
     if(!this.state.animating) {
@@ -198,7 +198,7 @@ class Project extends Component {
       this._isMouseMoving = true;
     }
   }
-  
+
   removeMouseMove = () => {
     if(this._isMouseMoving) {
       window.removeEventListener('mousemove', this.mouseMoveHandler);
@@ -206,7 +206,7 @@ class Project extends Component {
       this._isMouseMoving = false;
 
       TweenMax.killTweensOf(this.projectEl, { rotationX: true, rotationY: true });
-      TweenMax.to(this.projectEl, 1, {rotationX: 0, rotationY: 0, ease: Power2.easeOut});  
+      TweenMax.to(this.projectEl, 1, {rotationX: 0, rotationY: 0, ease: Power2.easeOut});
     }
   }
 
@@ -215,31 +215,31 @@ class Project extends Component {
     if(u.isWindowMobile()) {
       const xAxisPos = e.beta;
       const yAxisPos = e.gamma;
-      
+
       const xRatio = ((xAxisPos - 40) / 60).toFixed(2);
       const yRatio = (yAxisPos / 35).toFixed(2);
-      
+
       TweenMax.killTweensOf(this.projectEl, { rotationX: true, rotationY: true });
-      TweenMax.to(this.projectEl, 0.75, { 
-        rotationX: 5 * xRatio, 
+      TweenMax.to(this.projectEl, 0.75, {
+        rotationX: 5 * xRatio,
         rotationY: 6 * -yRatio,
         ease: Power1.easeOut
       });
     }
   }
-  
+
   // Handles mouse move interaction on desktop...
   mouseMoveHandler = (e) => {
     if(u.isWindowDesktop()) {
       const xPos = e.clientX;
       const yPos = e.clientY;
-  
+
       const xRatio = ((xPos - (window.innerWidth / 2)) / (window.innerWidth / 2)).toFixed(2);
       const yRatio = ((yPos - (window.innerHeight / 2)) / (window.innerHeight / 2)).toFixed(2);
-  
+
       TweenMax.killTweensOf(this.projectEl, { rotationX: true, rotationY: true });
-      TweenMax.to(this.projectEl, 1.5, { 
-        rotationX: -6 * yRatio, 
+      TweenMax.to(this.projectEl, 1.5, {
+        rotationX: -6 * yRatio,
         rotationY: 6 * xRatio,
         ease: Power1.easeOut
       });
@@ -266,13 +266,12 @@ class Project extends Component {
       right:  { set: {x: this.winWidth}, to: {x: 0} },
       in:     { set: {z: 300}, to: {z: 0} }
     };
-    
+
     if(this.projectBtnEl) {
       elementGroup.push(this.projectBtnEl);
     }
 
     this.tlAppear
-      .delay(0.25)
       .set(this.projectEl, {...params[direction].set}, 0)
       .set([...elementGroup, this.bgImage, this.shape, this.bgSubImage], {autoAlpha: 0}, 0)
       .to(this.projectEl, 0.7, {...params[direction].to, ease: Power2.easeOut}, 0.65)
@@ -284,10 +283,10 @@ class Project extends Component {
 
   leaveTweens = (direction) => {
     this.removeMouseMove();
-    this.tlAppear.clear(); 
+    this.tlAppear.clear();
     const autoAlphaEaseIn = {autoAlpha: 0, ease: Expo.easeIn};
-    const elementGroup  = [this.projectTextEl, this.codeBtnEl, this.techEl];
-    const imageGroup = [this.bgImage, this.shape, this.bgSubImage];
+    let elementGroup  = [this.projectTextEl, this.codeBtnEl, this.techEl];
+    let imageGroup = [this.bgImage, this.shape, this.bgSubImage];
     const params = {
       top:    { toMain: {y: -this.winHeight} },
       bottom: { toMain: {y: this.winHeight} },
@@ -299,7 +298,7 @@ class Project extends Component {
     if(this.projectBtnEl) {
       elementGroup.push(this.projectBtnEl);
     }
-    
+
     this.tlLeave
       .to(this.projectEl, 0.6, {...params[direction].toMain, ease: Expo.easeIn}, 0)
       .to(elementGroup, 0.7, {opacity: 0, ease: Expo.easeOut}, 0)
@@ -329,18 +328,18 @@ class Project extends Component {
 
     if(this.props.navIsOpen) {
       this.zoomTweens.play();
-    } 
+    }
   }
-    
-  render() { 
-    const { 
-      details: { techList, shape, image, subImage, name, year, role, description }, 
+
+  render() {
+    const {
+      details: { techList, shape, image, subImage, name, year, role, description },
       id } = this.props;
-    
+
     let technologies = [];
     for (const tech in techList) {
       if(techList[tech]) {
-        technologies.push(<Technologies 
+        technologies.push(<Technologies
           key={tech}
           techType={tech}
           techList={techList[tech]} />);
@@ -369,7 +368,7 @@ class Project extends Component {
             <span ref={this.separatorRef} className={c.Project__TitleSeparator}>
             </span>
             <div className={c.Project__YearRole}>
-              <Year 
+              <Year
                 elementRef={this.yearRef}
                 context='portfolio'
                 text={year} />
@@ -419,7 +418,7 @@ Project.propTypes = {
   }).isRequired,
   navIsOpen: PropTypes.bool.isRequired
 }
- 
+
 const mapStateToProps = state => {
   return {
     navIsOpen: state.ui.navIsOpen
