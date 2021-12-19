@@ -130,7 +130,6 @@ class About extends Component {
       .set(this.contactLinksEl, {autoAlpha: 0}, 0)
       // .set(this.toggleBottomEl, {autoAlpha: 0}, 0)
 
-      .delay(.5)
       .to(this.aboutContentEl, 0.8, {...params[direction].main.to, ease: Expo.easeOut}, 0)
       .to(this.aboutContentEl, 0.8, {autoAlpha: 1, ease: Expo.easeIn}, 0)
       .to(this.contactLinksEl, 0.5, {autoAlpha: 1, ease: Expo.easeIn}, 0.65 + 0.3)
