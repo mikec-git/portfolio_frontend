@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/portfolio_frontend/precache-manifest.b9086e1996bb27b9c28ae71e3e59da19.js"
+  "/mikec-git/portfolio_frontend/precache-manifest.ee796aa33f43efd7a12d2da0d931b183.js"
 );
 
 workbox.clientsClaim();
@@ -28,7 +28,7 @@ self.__precacheManifest = [].concat(self.__precacheManifest || []);
 workbox.precaching.suppressWarnings();
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
 
-workbox.routing.registerNavigationRoute("/portfolio_frontend/index.html", {
+workbox.routing.registerNavigationRoute("/mikec-git/portfolio_frontend/index.html", {
   
   blacklist: [/^\/_/,/\/[^/]+\.[^/]+$/],
 });
