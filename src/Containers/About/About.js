@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { TimelineMax, Expo, Power4, Power2, TweenMax } from 'gsap';
+import { TimelineMax, Expo, Power2, TweenMax } from 'gsap';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
 import AboutContent from '../../Components/ORGANISMS/About/About/About';
-import Contact from '../../Components/ORGANISMS/About/Contact/Contact';
-import ToggleBtn from '../../Components/ATOMS/About -A/ToggleBtn/ToggleBtn';
+// import Contact from '../../Components/ORGANISMS/About/Contact/Contact';
+// import ToggleBtn from '../../Components/ATOMS/About -A/ToggleBtn/ToggleBtn';
 import c from './About.module.scss';
 import * as u from '../../Shared/utility';
 
