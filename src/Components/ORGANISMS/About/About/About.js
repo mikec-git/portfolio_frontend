@@ -34,7 +34,7 @@ const about = (props) => {
 
             `I started my programming journey at Queen's University where I graduated with a bachelors in Engineering Physics. Upon stumbling across web development, I quickly fell in love with it.`,
 
-            `Currently, I'm a full-stack developer at Fortinet, and have extensive experience working with Python, Vue, and SQL Server.`,
+            [`Currently, I'm a `, {emphasis: true, phrase: `full-stack developer @ Fortinet`}, `, and work with Python, Vue, and SQL Server on a daily basis.`],
 
             `When my hands are off my keyboard, I enjoy lifting at the gym, snowboarding, and going to the beach!`
           ]}
