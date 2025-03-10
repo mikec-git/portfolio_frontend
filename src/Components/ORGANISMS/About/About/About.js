@@ -34,7 +34,7 @@ const about = (props) => {
 
             `I started my programming journey at Queen's University where I graduated with a bachelors in Engineering Physics. Upon stumbling across web development, I quickly fell in love with it.`,
 
-            [`Currently, I'm a `, {emphasis: true, phrase: `full-stack developer @ Fortinet`}, `, and work with Python, Vue, and SQL Server on a daily basis.`],
+            [`Currently, I'm a `, {emphasis: true, phrase: `full-stack developer @ Fortinet`}, `, and work with Python, Golang, and SQL (PostgreSQL) on a daily basis.`],
 
             `When my hands are off my keyboard, I enjoy lifting at the gym, snowboarding, and going to the beach!`
           ]}
@@ -42,7 +42,7 @@ const about = (props) => {
             `I'm looking for a `,
             {emphasis: true, phrase: `full-time position`},
             ` in the `,
-            {emphasis: true, phrase: `USA & Vancouver (Canada).`},
+            {emphasis: true, phrase: `USA.`},
             ` New experiences are my thing, so I'm all ears for cool and challenging opportunities!`]} />
         <ContactLinks
           elementRef={props.contactLinksRef}
