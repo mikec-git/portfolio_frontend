@@ -60,24 +60,24 @@ self.__precacheManifest = [
     "url": "/static/media/Mohave-Medium.2dca0f26.otf"
   },
   {
-    "revision": "c3d4e95c866a2dc6d25e5240b787e48a",
-    "url": "/static/media/Mohave-Bold.c3d4e95c.otf"
-  },
-  {
     "revision": "ab53447b163dad1d6601d0fa84484d0d",
     "url": "/static/media/BLANCH_CONDENSED.ab53447b.otf"
+  },
+  {
+    "revision": "c3d4e95c866a2dc6d25e5240b787e48a",
+    "url": "/static/media/Mohave-Bold.c3d4e95c.otf"
   },
   {
     "revision": "868b48e8d045410a038de3fd61ce8b48",
     "url": "/static/media/BLANCH_CAPS.868b48e8.otf"
   },
   {
-    "revision": "797c885328e72d878b62ae4ab0e48c9a",
-    "url": "/static/media/BLANCH_CAPS_LIGHT.797c8853.otf"
-  },
-  {
     "revision": "ff8ba422ddea745609915817f1252497",
     "url": "/static/media/BLANCH_CONDENSED_LIGHT.ff8ba422.otf"
+  },
+  {
+    "revision": "797c885328e72d878b62ae4ab0e48c9a",
+    "url": "/static/media/BLANCH_CAPS_LIGHT.797c8853.otf"
   },
   {
     "revision": "465f11fbeef7fbd941083a66f757c81c",
