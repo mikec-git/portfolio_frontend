@@ -34,9 +34,9 @@ const about = (props) => {
 
             `I started my programming journey at Queen's University where I graduated with a bachelors in Engineering Physics. Upon stumbling across web development, I quickly fell in love with it.`,
 
-            [`Currently, I'm a `, {emphasis: true, phrase: `full-stack developer @ Fortinet`}, `, and work with Python, Golang, and SQL (PostgreSQL) on a daily basis.`],
+            [`Currently, I'm a `, {emphasis: true, phrase: `senior software developer @ Fortinet`}, `, and work with Python, Golang, and SQL (PostgreSQL) on a daily basis.`],
 
-            `When my hands are off my keyboard, I enjoy lifting at the gym, snowboarding, and going to the beach!`
+            `When my hands are off my keyboard, I enjoy lifting at the gym, doing Muay Thai, and going to the beach!`
           ]}
           closing={[
             `I'm looking for a `,
