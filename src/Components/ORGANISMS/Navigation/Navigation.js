@@ -7,7 +7,7 @@ import NavItems from '../../MOLECULES/Navigation - M/NavItems/NavItems';
 import Hamburger from '../../ATOMS/Navigation - A/Hamburger/Hamburger';
 import Backdrop from '../../ATOMS/UI - A/Backdrop/Backdrop';
 
-import resume from '../../../Assets/pdf/resume.pdf';
+// import resume from '../../../Assets/pdf/resume.pdf';
 import c from './Navigation.module.scss';
 import * as UIActions from '../../../Store/Actions/UIActions';
 
@@ -32,12 +32,12 @@ class Navigation extends Component {
         routeName: 'About',
         id: 3
       },
-      {
-        isResume: true,
-        routeName: 'Resume',
-        resume: resume,
-        id: 4
-      },
+      // {
+      //   isResume: true,
+      //   routeName: 'Resume',
+      //   resume: resume,
+      //   id: 4
+      // },
     ],
     navIsSliding: false,
     navIsAnimating: false

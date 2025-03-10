@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import c from './ContactLink.module.scss';
-import resume from '../../../../Assets/pdf/resume.pdf';
+// import resume from '../../../../Assets/pdf/resume.pdf';
 
 const contactLink = (props) => {
   let linkType = /[\d\w_]+(?=\.(svg|png|jpg))/.exec(props.imgAlt)[0];;
-  let url = resume;
+  let url = '';
   let target = '_blank';
   let rel = "noopener noreferrer";
 
