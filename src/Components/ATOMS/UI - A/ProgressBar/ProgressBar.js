@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { CSSTransition } from 'react-transition-group';
 import { Expo, TimelineMax } from 'gsap';
-import assetsLoader from 'assets-loader';
+import * as assetsLoader from 'assets-loader';
 import PropTypes from 'prop-types';
 
 import ProgressLogo from '../ProgressLogo/ProgressLogo';
@@ -68,16 +68,17 @@ class ProgressBar extends PureComponent {
       const image = new Image();
       image.src = files(file);
       imgs[fileString] = image;
-      
       assets.push(files(file));
     });
 
     // Loads assets-loader with images to load
-    assetsLoader({assets})
-      .on('progress', (progress) => this.setState({ progress: +progress.toFixed(5) }))
-      .on('complete', () => this.setState({ loadComplete: true }))
-    .start();
-
+    // assetsLoader({assets})
+    //   .on('progress', (progress) => this.setState({ progress: +progress.toFixed(5) }))
+    //   .on('complete', () => this.setState({ loadComplete: true }))
+    // .start();
+    setTimeout(5000)
+    this.setState({ progress: 1})
+    this.setState({ loadComplete: true })
     this.smoothOutProgressAmount();
     return imgs;
   }

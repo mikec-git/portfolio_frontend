@@ -9,13 +9,14 @@ const navItems = (props) => {
   let navList = props.navRoutes.map(route => {
     return (
       <NavItem
-        key={route.to || route.resume}
+        // key={route.to || route.resume}
+        key={route.to}
         to={route.to}
         routeName={route.routeName}
         routeChange={props.routeChange}
         routeTo={route.routeTo}
-        isResume={route.isResume}
-        resume={route.resume}
+        // isResume={route.isResume}
+        // resume={route.resume}
         toggleNav={props.toggleNav}
         id={route.id} />
     );
