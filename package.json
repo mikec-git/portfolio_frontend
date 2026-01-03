@@ -6,11 +6,13 @@
   "dependencies": {
     "assets-loader": "^0.5.2",
     "axios": "^0.18.0",
+    "fsevents": "2.2.1",
     "gsap": "^2.0.2",
     "hammerjs": "^2.0.8",
     "lodash": "^4.17.11",
     "memoize-one": "^5.0.0",
     "moment": "^2.24.0",
+    "node-pre-gyp": "0.17.0",
     "node-sass": "^4.11.0",
     "npm": "^6.8.0",
     "prop-types": "^15.7.2",
@@ -43,7 +45,7 @@
     "not op_mini all"
   ],
   "devDependencies": {
-    "gh-pages": "^3.2.3",
+    "gh-pages": "~3.2.3",
     "jest-dom": "^3.1.2",
     "react-testing-library": "^6.0.0",
     "user-event": "^1.4.4"
