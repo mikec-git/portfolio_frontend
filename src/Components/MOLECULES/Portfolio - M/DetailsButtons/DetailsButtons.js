@@ -13,9 +13,9 @@ const detailsButtons = (props) => {
       url={props.details.codeUrl} />
   );
   
-  if(props.details.name !== 'Portfolio') {  
+  if(props.details.projectUrl) {
     viewProjectBtn = (
-      <ProjectButton 
+      <ProjectButton
         elementRef={props.projectBtnRef}
         color={props.details.btnColor}
         txtColor={props.details.txtColor}
