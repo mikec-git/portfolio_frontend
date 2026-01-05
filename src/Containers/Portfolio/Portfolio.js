@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import gsap from 'gsap';
 
 import slides from '../../Components/ORGANISMS/ThreeJsBackground/slides';
 import Project from '../../Components/ORGANISMS/Portfolio/Project';
@@ -7,7 +8,6 @@ import PageIndicator from '../../Components/MOLECULES/UI - M/PageIndicator/PageI
 
 import * as u from '../../Shared/utility';
 import c from './Portfolio.module.scss';
-import { TweenMax, Expo, Power2 } from 'gsap';
 
 class Portfolio extends Component {
   state = {
@@ -29,8 +29,8 @@ class Portfolio extends Component {
     if(!this.props.routeAnim.appear) {
       this.setState({ animating: false });
     } else {
-      TweenMax.set(this.pageIndicatorEl, {autoAlpha: 0});
-      TweenMax.to(this.pageIndicatorEl, 1, {autoAlpha: 1, ease: Power2.easeOut}).delay(1);
+      gsap.set(this.pageIndicatorEl, {autoAlpha: 0});
+      gsap.to(this.pageIndicatorEl, {duration: 1, autoAlpha: 1, ease: "power2.out", delay: 1});
     }
 
     this.addEvents();
@@ -38,7 +38,7 @@ class Portfolio extends Component {
 
   componentWillUnmount() {
     this._isMounted = false;
-    this.props.animationCallback();
+    this.props.animationCallback && this.props.animationCallback();
 
     const animatingProject = {
       id:   { from: null, to: null },
@@ -58,7 +58,7 @@ class Portfolio extends Component {
       routeAnim: prevRouteAnim } = prevProps;
 
     if(animationCallback && !prevAnimCallback) {
-      TweenMax.to(this.pageIndicatorEl, 0.5, {autoAlpha: 0, ease: Expo.easeOut});
+      gsap.to(this.pageIndicatorEl, {duration: 0.5, autoAlpha: 0, ease: "expo.out"});
     }
 
     if(scrollAmount !== prevScrollAmount && this._isMounted) {
@@ -66,9 +66,9 @@ class Portfolio extends Component {
     }
 
     if(navIsOpen && !prevNavIsOpen) {
-      TweenMax.to(this.pageIndicatorEl, 0.5, {autoAlpha: 0, ease: Expo.easeOut});
+      gsap.to(this.pageIndicatorEl, {duration: 0.5, autoAlpha: 0, ease: "expo.out"});
     } else if(!navIsOpen && prevNavIsOpen && routeAnim.leave === prevRouteAnim.leave) {
-      TweenMax.to(this.pageIndicatorEl, 0.5, {autoAlpha: 1, ease: Expo.easeOut});
+      gsap.to(this.pageIndicatorEl, {duration: 0.5, autoAlpha: 1, ease: "expo.out"});
     }
   }
 
@@ -83,19 +83,21 @@ class Portfolio extends Component {
   }
 
   scrollHandler = (e) => {
-    if(!this.props.navIsOpen) {
-      this.projectScrollAmount = this.props.scrollAmount * 80;
+    if(!this.props.navIsOpen && !this.state.animating) {
+      let newScrollAmount = this.props.scrollAmount;
 
-      if(e && !this.state.animating) {
-        const sign      = e.deltaY > 0 ? 2 : -2;
-        const newScroll = sign + this.props.scrollAmount;
-        this.props.changeScroll(newScroll);
+      if(e) {
+        const sign = e.deltaY > 0 ? 2 : -2;
+        newScrollAmount = sign + this.props.scrollAmount;
+        this.props.changeScroll(newScrollAmount);
       }
 
+      const projectScrollAmount = newScrollAmount * 80;
+
       // Down -> leave left | Up -> leave right
-      if(this.projectScrollAmount > 300) {
+      if(projectScrollAmount > 225) {
         this.resetScrollAndInitiateLeave('down');
-      } else if(this.projectScrollAmount < -300) {
+      } else if(projectScrollAmount < -225) {
         this.resetScrollAndInitiateLeave('up');
       }
     }
@@ -126,7 +128,6 @@ class Portfolio extends Component {
       toId = curId === 1 ? this.maxProjectId : curId - 1;
     }
     this.leaveProjectHandler(null, toId, direction);
-    this.projectScrollAmount = 0;
     this.props.changeScroll(0);
   }
 
@@ -176,6 +177,7 @@ class Portfolio extends Component {
   }
 
   render() {
+    const projectScrollAmount = this.props.scrollAmount * 80;
     const projects = [];
     for (const project of this.slides) {
       projects.push(
@@ -187,7 +189,7 @@ class Portfolio extends Component {
           descColor={project.descriptionColor}
           yearColor={project.yearColor}
           changeProject={this.arrowkeyPressedHandler}
-          projectScrollAmount={this.projectScrollAmount}
+          projectScrollAmount={projectScrollAmount}
           animating={this.state.animating}
           page={this.props.page}
           onComplete={this.completedAnimHandler}

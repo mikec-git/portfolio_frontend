@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { TimelineMax, Power2, Expo, Power1, TweenMax } from 'gsap';
+import gsap from 'gsap';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import Hammer from 'hammerjs';
@@ -56,17 +56,17 @@ class Project extends Component {
     this.winWidth     = window.innerWidth;
 
     const yearColorElements = [this.yearEl, this.roleEl, this.techEl];
-    TweenMax.set(this.titleMainEl, {color: this.props.fontColor});
-    TweenMax.set(this.descriptionEl, {color: this.props.descColor});
-    TweenMax.set(yearColorElements, {color: this.props.yearColor});
-    TweenMax.set(this.separatorEl, {backgroundColor: this.props.yearColor});
+    gsap.set(this.titleMainEl, {color: this.props.fontColor});
+    gsap.set(this.descriptionEl, {color: this.props.descColor});
+    gsap.set(yearColorElements, {color: this.props.yearColor});
+    gsap.set(this.separatorEl, {backgroundColor: this.props.yearColor});
 
     const appearAnim    = this.props.routeAnim.appear;
     const { id, anim }  = this.props.animatingProject;
 
     // Create leave and appear tweens for route/project changes...
-    this.tlLeave  = new TimelineMax({onComplete: this.props.onFinishLeave});
-    this.tlAppear = new TimelineMax({onComplete: this.onCompleteHandlerAppear});
+    this.tlLeave  = gsap.timeline({onComplete: this.props.onFinishLeave});
+    this.tlAppear = gsap.timeline({onComplete: this.onCompleteHandlerAppear});
 
     // If this is a project-to-project transition...
     if(id.to && id.to === this.props.id && this.props.animating) {
@@ -74,16 +74,18 @@ class Project extends Component {
       // If this is a route-to-portfolio transition...
     } else if(appearAnim && this[appearAnim]) {
       this.setState({ animating: true }, this[appearAnim]);
-      // If this is an initial page load...
-    } else if(!this.props.navIsOpen) {
+      // If this is an initial page load (no animation)...
+    } else {
       this.addMouseMove();
+      // Signal that "animation" is complete so Portfolio can enable scrolling
+      this.props.onComplete && this.props.onComplete();
     }
 
     // Custom zoom in/out animation...
-    this.zoomTweens = new TimelineMax({paused: true});
+    this.zoomTweens = gsap.timeline({paused: true});
     this.zoomTweens
-      .to(this.projectTextEl, .25, {autoAlpha: 0, ease: Power2.easeInOut})
-      .to(this.bgImagesEl, .65, {left: '50%', top: '50%', ease: Power2.easeInOut}, '-=0.5');
+      .to(this.projectTextEl, {duration: 0.25, autoAlpha: 0, ease: "power2.inOut"})
+      .to(this.bgImagesEl, {duration: 0.65, left: '50%', top: '50%', ease: "power2.inOut"}, '-=0.5');
 
     this.addEvents();
   }
@@ -121,7 +123,7 @@ class Project extends Component {
       this.zoomTweens.progress(0).play();
       // If nav is closed...
     } else if(!navIsOpen && prevNavIsOpen && leaveAnim === prevLeaveAnim) {
-      TweenMax.delayedCall(0.4, () => this.zoomTweens.progress(1).reverse());
+      gsap.delayedCall(0.4, () => this.zoomTweens.progress(1).reverse());
     }
 
     // Needs this here since I preload images (not avail on inital mount)
@@ -186,8 +188,8 @@ class Project extends Component {
   onProjectScrolling = (scroll) => {
     // Scrolls project contents with background
     if(!this.state.animating) {
-      TweenMax.killTweensOf( this.projectEl, {x: true} );
-      TweenMax.to( this.projectEl, 0.5, {x: -scroll} );
+      gsap.killTweensOf( this.projectEl, "x" );
+      gsap.to( this.projectEl, {duration: 0.5, x: -scroll} );
     }
   }
 
@@ -205,8 +207,8 @@ class Project extends Component {
       window.removeEventListener('deviceorientation', this.gyroscopeHandler);
       this._isMouseMoving = false;
 
-      TweenMax.killTweensOf(this.projectEl, { rotationX: true, rotationY: true });
-      TweenMax.to(this.projectEl, 1, {rotationX: 0, rotationY: 0, ease: Power2.easeOut});
+      gsap.killTweensOf(this.projectEl, "rotationX,rotationY");
+      gsap.to(this.projectEl, {duration: 1, rotationX: 0, rotationY: 0, ease: "power2.out"});
     }
   }
 
@@ -219,11 +221,12 @@ class Project extends Component {
       const xRatio = ((xAxisPos - 40) / 60).toFixed(2);
       const yRatio = (yAxisPos / 35).toFixed(2);
 
-      TweenMax.killTweensOf(this.projectEl, { rotationX: true, rotationY: true });
-      TweenMax.to(this.projectEl, 0.75, {
+      gsap.killTweensOf(this.projectEl, "rotationX,rotationY");
+      gsap.to(this.projectEl, {
+        duration: 0.75,
         rotationX: 5 * xRatio,
         rotationY: 6 * -yRatio,
-        ease: Power1.easeOut
+        ease: "power1.out"
       });
     }
   }
@@ -237,11 +240,12 @@ class Project extends Component {
       const xRatio = ((xPos - (window.innerWidth / 2)) / (window.innerWidth / 2)).toFixed(2);
       const yRatio = ((yPos - (window.innerHeight / 2)) / (window.innerHeight / 2)).toFixed(2);
 
-      TweenMax.killTweensOf(this.projectEl, { rotationX: true, rotationY: true });
-      TweenMax.to(this.projectEl, 1.5, {
+      gsap.killTweensOf(this.projectEl, "rotationX,rotationY");
+      gsap.to(this.projectEl, {
+        duration: 1.5,
         rotationX: -6 * yRatio,
         rotationY: 6 * xRatio,
-        ease: Power1.easeOut
+        ease: "power1.out"
       });
     }
   }
@@ -249,15 +253,15 @@ class Project extends Component {
   // When project fully arrives into scene...
   onCompleteHandlerAppear = () => {
     // Change animating project values in app state to null...
-    this.props.onComplete();
+    this.props.onComplete && this.props.onComplete();
     this._isMounted && this.setState({ animating: false }, this.addMouseMove);
   }
 
   appearTweens = (direction) => {
     this.tlAppear.clear();
+    this.tlAppear.eventCallback("onComplete", this.onCompleteHandlerAppear);
     const elementGroup  = [this.projectTextEl, this.codeBtnEl, this.techEl];
     const subImgAutoAlpha = this.props.id === 1 ? 0.65 : 1;
-    const autoAlphaEaseIn = {autoAlpha: 1, ease: Power2.easeIn};
 
     const params = {
       top:    { set: {y: -this.winHeight}, to: {y: 0} },
@@ -274,17 +278,16 @@ class Project extends Component {
     this.tlAppear
       .set(this.projectEl, {...params[direction].set}, 0)
       .set([...elementGroup, this.bgImage, this.shape, this.bgSubImage], {autoAlpha: 0}, 0)
-      .to(this.projectEl, 0.7, {...params[direction].to, ease: Power2.easeOut}, 0.65)
+      .to(this.projectEl, {duration: 0.7, ...params[direction].to, ease: "power2.out"}, 0.65)
       .call(this.addMouseMove)
-      .staggerTo(elementGroup, 0.7, {...autoAlphaEaseIn}, 0.05, '-=0.15')
-      .to([this.bgImage, this.shape], 0.7, {...autoAlphaEaseIn}, 0.65)
-      .to(this.bgSubImage, 0.7, {autoAlpha: subImgAutoAlpha, ease: Power2.easeIn}, 0.65);
+      .to(elementGroup, {duration: 0.7, autoAlpha: 1, ease: "power2.in", stagger: 0.05}, '-=0.15')
+      .to([this.bgImage, this.shape], {duration: 0.7, autoAlpha: 1, ease: "power2.in"}, 0.65)
+      .to(this.bgSubImage, {duration: 0.7, autoAlpha: subImgAutoAlpha, ease: "power2.in"}, 0.65);
   }
 
   leaveTweens = (direction) => {
     this.removeMouseMove();
     this.tlAppear.clear();
-    const autoAlphaEaseIn = {autoAlpha: 0, ease: Expo.easeIn};
     let elementGroup  = [this.projectTextEl, this.codeBtnEl, this.techEl];
     let imageGroup = [this.bgImage, this.shape, this.bgSubImage];
     const params = {
@@ -300,9 +303,9 @@ class Project extends Component {
     }
 
     this.tlLeave
-      .to(this.projectEl, 0.6, {...params[direction].toMain, ease: Expo.easeIn}, 0)
-      .to(elementGroup, 0.7, {opacity: 0, ease: Expo.easeOut}, 0)
-      .to(imageGroup, 0.6, {...autoAlphaEaseIn}, 0);
+      .to(this.projectEl, {duration: 0.6, ...params[direction].toMain, ease: "expo.in"}, 0)
+      .to(elementGroup, {duration: 0.7, opacity: 0, ease: "expo.out"}, 0)
+      .to(imageGroup, {duration: 0.6, autoAlpha: 0, ease: "expo.in"}, 0);
   }
 
   appearTop     = () => this.appearTweens('top');
@@ -318,13 +321,13 @@ class Project extends Component {
 
   onPageResize = () => {
     // Resets zoomTweens instance variable as it stores the previous DOM state
-    this.zoomTweens = new TimelineMax({paused: true});
+    this.zoomTweens = gsap.timeline({paused: true});
     this.zoomTweens
-      .to(this.projectTextEl, .75, {autoAlpha: 0, ease: Power2.easeInOut})
-      .to(this.bgImagesEl, .75, {left: '50%', top: '50%', ease: Power2.easeInOut}, '-=0.5');
+      .to(this.projectTextEl, {duration: 0.75, autoAlpha: 0, ease: "power2.inOut"})
+      .to(this.bgImagesEl, {duration: 0.75, left: '50%', top: '50%', ease: "power2.inOut"}, '-=0.5');
 
     // Clear the props on the bg images and text since they also store the previous DOM state
-    TweenMax.set([this.bgImagesEl, this.projectTextEl], {clearProps: 'all'});
+    gsap.set([this.bgImagesEl, this.projectTextEl], {clearProps: 'all'});
 
     if(this.props.navIsOpen) {
       this.zoomTweens.play();

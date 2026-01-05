@@ -1,7 +1,7 @@
 import * as contactActions from '../Actions/ContactActions';
 import { put, call } from 'redux-saga/effects';
 import { contactAxios } from '../../Shared/axios';
-import moment from 'moment';
+import { format } from 'date-fns';
 
 export function* sendMessageSaga(action) {
   try {
@@ -9,7 +9,7 @@ export function* sendMessageSaga(action) {
     yield put(contactActions.sendMessageInit());
 
     // Send the client's local time to server...
-    const dateSent = moment(new Date()).format("dddd, MMMM Do YYYY, h:mm:ss a");
+    const dateSent = format(new Date(), "EEEE, MMMM do yyyy, h:mm:ss a");
 
     // Construct message body to send to server...
     const body = {

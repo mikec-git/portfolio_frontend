@@ -69,11 +69,11 @@
     height: $handle-height;
     border-radius: 50%;
     cursor: pointer;
-    
+
     position: absolute;
     left: 50%;
     bottom: 0;
-    transform: translate(-50%, 0);
+    margin-left: -$handle-width / 2;
     z-index: 100000;
   }
 

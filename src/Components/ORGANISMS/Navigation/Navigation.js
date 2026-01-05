@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TimelineMax, Power2 } from 'gsap';
+import gsap from 'gsap';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
@@ -60,8 +60,8 @@ class Navigation extends Component {
       this.layerRef[2].current
     ];
 
-    this.navTl        = new TimelineMax();
-    this.burgerTl     = new TimelineMax();
+    this.navTl        = gsap.timeline();
+    this.burgerTl     = gsap.timeline();
     this._isMounted   = true;
     this.routeChanged = false;
   }
@@ -111,12 +111,12 @@ class Navigation extends Component {
     if(status === 'leave') {
       this.setState({ navIsSliding: true });
       this.burgerTl
-        .staggerTo(this.burgerLayersEl, 0.5, {width: 0, autoAlpha: 0}, 0.2, 0)
+        .to(this.burgerLayersEl, {duration: 0.5, width: 0, autoAlpha: 0, stagger: 0.2}, 0)
         .set(this.hamburgerEl, {autoAlpha: 0});
     } else if(status === 'enter') {
       this.burgerTl
         .set(this.hamburgerEl, {autoAlpha: 1})
-        .staggerTo(this.burgerLayersEl, 0.5, {autoAlpha: 1, width: '100%'}, 0.2)
+        .to(this.burgerLayersEl, {duration: 0.5, autoAlpha: 1, width: '100%', stagger: 0.2})
         .call(() => this.setState({ navIsSliding: false }));
     }
   }
@@ -126,22 +126,22 @@ class Navigation extends Component {
     this.navTl.clear();
     if(status === 'opening') {
       this.navTl
-        .staggerTo(this.burgerLayerEl, 1, {backgroundColor: '#e50000', ease: Power2.easeInOut}, 0.2, 'burger')
-        .to(this.ringEl, 1, {autoAlpha: 1, border: '2px solid #e50000', ease: Power2.easeInOut}, 'burger+=0.5');
+        .to(this.burgerLayerEl, {duration: 1, backgroundColor: '#e50000', ease: "power2.inOut", stagger: 0.2}, 'burger')
+        .to(this.ringEl, {duration: 1, autoAlpha: 1, border: '2px solid #e50000', ease: "power2.inOut"}, 'burger+=0.5');
     } else if(status === 'openComplete') {
       this.navTl
         .set(this.navItemsEl, {y: 50, autoAlpha: 0}, 0)
-        .staggerTo(this.navItemsEl, 0.5, {y: 0, autoAlpha: 1}, 0.05, 0);
+        .to(this.navItemsEl, {duration: 0.5, y: 0, autoAlpha: 1, stagger: 0.05}, 0);
     } else if(status === 'closing') {
       this.navTl
-        .to(this.ringEl, 0.5, {autoAlpha: 0, border: '2px solid #cccccc', ease: Power2.easeInOut}, 0)
-        .staggerTo(this.burgerLayerEl, 0.5, {backgroundColor: '#cccccc', ease: Power2.easeInOut}, 0.2, 0)
-        .staggerTo(this.navItemsEl, 0.25, {autoAlpha: 0}, -0.05, 0)
+        .to(this.ringEl, {duration: 0.5, autoAlpha: 0, border: '2px solid #cccccc', ease: "power2.inOut"}, 0)
+        .to(this.burgerLayerEl, {duration: 0.5, backgroundColor: '#cccccc', ease: "power2.inOut", stagger: 0.2}, 0)
+        .to(this.navItemsEl, {duration: 0.25, autoAlpha: 0, stagger: -0.05}, 0)
         .set(this.burgerLayerEl, {clearProps: 'all'});
     } else if(status === 'clicked') {
       this.navTl
         .set(this.bgCircleEl, {width: 0, height: 0}, 0)
-        .to(this.bgCircleEl, 0.2, {backgroundColor: '#f2f2f2', width: "100%", height: "100%"}, 'burger')
+        .to(this.bgCircleEl, {duration: 0.2, backgroundColor: '#f2f2f2', width: "100%", height: "100%"}, 'burger')
         .set(this.bgCircleEl, {backgroundColor: 'transparent'});
     }
   }
@@ -184,7 +184,7 @@ class Navigation extends Component {
           navIsOpen={this.props.navIsOpen}
           navToggle={burgerNavToggle} />
         <Backdrop
-          isOpen={this.props.navIsOpen}
+          isOpen={this.props.navIsOpen && this.props.navZoomComplete}
           backdropClicked={navToggleHandler}
           stateChanged={this.toggleNavAnimatingHandler} />
         <NavItems
@@ -203,7 +203,8 @@ Navigation.propTypes = {
   changeRouteAnim: PropTypes.func.isRequired,
   navIsOpen: PropTypes.bool.isRequired,
   isSliding: PropTypes.bool.isRequired,
-  navToggleHandler: PropTypes.func.isRequired
+  navToggleHandler: PropTypes.func.isRequired,
+  navZoomComplete: PropTypes.bool
 }
 
 const mapStateToProps = state => {

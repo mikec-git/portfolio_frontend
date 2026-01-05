@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { TimelineMax, TweenMax, Power2 } from 'gsap';
+import gsap from 'gsap';
 import { Draggable } from 'gsap/all';
 import PropTypes from 'prop-types';
 
@@ -7,6 +7,8 @@ import Handle from '../../../ATOMS/UI - A/Handle/Handle';
 import PageIndicatorBar from '../../../ATOMS/UI - A/PageIndicatorBar/PageIndicatorBar';
 
 import c from './PageIndicator.module.scss';
+
+gsap.registerPlugin(Draggable);
 
 class PageIndicator extends PureComponent {
   state = {
@@ -28,7 +30,7 @@ class PageIndicator extends PureComponent {
   transitionDuration  = 1.3;
 
   componentDidMount() {
-    this.tl = new TimelineMax();
+    this.tl = gsap.timeline();
     this.pageIndicatorEl = this.props.elementRef.current;
     this.handleProxy  = this.handleProxyRef.current;
     this.handleEl     = this.handleRef.current;
@@ -45,8 +47,8 @@ class PageIndicator extends PureComponent {
       lockAxis: 'x',
       cursor: 'pointer',
       bounds: {
-        minX: -this.state.bounds - this.handleWidth/2, 
-        maxX: this.state.bounds - this.handleWidth/2
+        minX: -this.state.bounds,
+        maxX: this.state.bounds
       },
       onDragStart: this.onDrag,
       onDrag: this.onDrag,
@@ -85,11 +87,11 @@ class PageIndicator extends PureComponent {
         // Animate handle/color transition according to appearing slide...
         this.tl && this.tl.clear();
         this.tl
-          .to(this.handleProxy, this.transitionDuration, {x: handlePosition, ease: Power2.easeInOut, overwrite: 'all'})
-          .to(this.handleEl, this.transitionDuration, {x: handlePosition, ease: Power2.easeInOut, overwrite: 'all'}, 0)
-          .to(this.barEl, this.transitionDuration, {backgroundColor: barColor, ease: Power2.easeInOut}, 0.65)
-          .to(this.slashEl, this.transitionDuration, {backgroundColor: barColor, ease: Power2.easeInOut}, 0)
-          .to([this.pageNumberEl, this.handleEl, this.pageIndicatorEl], this.transitionDuration, {color: barColor, ease: Power2.easeInOut}, 0)
+          .to(this.handleProxy, {duration: this.transitionDuration, x: handlePosition, ease: "power2.inOut", overwrite: 'all'})
+          .to(this.handleEl, {duration: this.transitionDuration, x: handlePosition, ease: "power2.inOut", overwrite: 'all'}, 0)
+          .to(this.barEl, {duration: this.transitionDuration, backgroundColor: barColor, ease: "power2.inOut"}, 0.65)
+          .to(this.slashEl, {duration: this.transitionDuration, backgroundColor: barColor, ease: "power2.inOut"}, 0)
+          .to([this.pageNumberEl, this.handleEl, this.pageIndicatorEl], {duration: this.transitionDuration, color: barColor, ease: "power2.inOut"}, 0)
           .call(() => this._animComplete = true);
 
         if(this._isMounted) {
@@ -112,7 +114,7 @@ class PageIndicator extends PureComponent {
       // Updates handle number values and position...
       const newSlideNum = this.calculatePositionInterval();
       this.setState({handlePosition: this.handle.x, currentSlideNum: newSlideNum}, () => {
-        TweenMax.to(this.handleEl, this.handleDelay, {x: this.handle.x, overwrite: 'all'});
+        gsap.to(this.handleEl, {duration: this.handleDelay, x: this.handle.x, overwrite: 'all'});
       });
     }
   }
@@ -126,7 +128,7 @@ class PageIndicator extends PureComponent {
         this.props.leaveProjectTo(null, this.state.currentSlideNum);
         this.tl && this.tl.clear();
         this.tl
-          .to([this.handleEl, this.handleProxy], this.handleDelay, {x: this.state.handlePosition, overwrite: 'all'}, 0, 0);
+          .to([this.handleEl, this.handleProxy], {duration: this.handleDelay, x: this.state.handlePosition, overwrite: 'all'}, 0);
       });
     }
   }
@@ -136,8 +138,8 @@ class PageIndicator extends PureComponent {
     const barWidth = bounds * 2;
 
     const barInterval = barWidth / (this.props.numOfSlides-1);
-    const minX = -bounds - this.handleWidth/2;
-    const maxX = bounds - this.handleWidth/2;
+    const minX = -bounds;
+    const maxX = bounds;
     const handlePosition = minX + ((this.props.currentSlideIndex-1) * barInterval);
 
     if(this._isMounted) {

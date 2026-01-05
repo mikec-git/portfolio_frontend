@@ -4,27 +4,23 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "assets-loader": "^0.5.2",
-    "axios": "^0.18.0",
-    "fsevents": "2.2.1",
-    "gsap": "^2.0.2",
+    "axios": "^1.6.0",
+    "date-fns": "^3.0.0",
+    "gsap": "^3.12.0",
     "hammerjs": "^2.0.8",
-    "lodash": "^4.17.11",
-    "memoize-one": "^5.0.0",
-    "moment": "^2.24.0",
-    "node-pre-gyp": "0.17.0",
-    "node-sass": "^4.11.0",
-    "npm": "^6.8.0",
-    "prop-types": "^15.7.2",
-    "react": "^16.8.2",
-    "react-dom": "^16.8.2",
-    "react-draggable": "^3.1.1",
-    "react-redux": "^6.0.0",
-    "react-router-dom": "^4.3.1",
-    "react-scripts": "2.1.2",
-    "react-transition-group": "^2.5.3",
-    "redux": "^4.0.1",
-    "redux-saga": "^0.16.2",
+    "lodash": "^4.17.21",
+    "memoize-one": "^6.0.0",
+    "prop-types": "^15.8.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-draggable": "^4.4.6",
+    "react-redux": "^8.1.0",
+    "react-router-dom": "^6.20.0",
+    "react-scripts": "5.0.1",
+    "react-transition-group": "^4.4.5",
+    "redux": "^4.2.1",
+    "redux-saga": "^1.2.3",
+    "sass": "^1.69.0",
     "three": "^0.99.0"
   },
   "scripts": {
@@ -45,9 +41,9 @@
     "not op_mini all"
   ],
   "devDependencies": {
-    "gh-pages": "~3.2.3",
-    "jest-dom": "^3.1.2",
-    "react-testing-library": "^6.0.0",
-    "user-event": "^1.4.4"
+    "@testing-library/jest-dom": "^6.1.0",
+    "@testing-library/react": "^14.1.0",
+    "@testing-library/user-event": "^14.5.0",
+    "gh-pages": "^6.1.0"
   }
 }

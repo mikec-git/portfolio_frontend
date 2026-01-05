@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TimelineMax, Power2 } from 'gsap';
+import gsap from 'gsap';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
@@ -14,21 +14,21 @@ import c from './Layout.module.scss';
 
 class Layout extends Component {
   state = {
-    curChild: this.props.children,
-    curUniqueId: this.props.uniqueId,
-    prevChild: null,
-    prevUniqueId: null,
+    curLocation: this.props.location,
+    prevLocation: null,
     pageAnimating: false,
     backgroundAnimating: false,
-    assetsLoaded: false
+    assetsLoaded: false,
+    navZoomComplete: false
   }
 
   mainRef = React.createRef();
+  navOverlayRef = React.createRef();
 
   componentDidMount() {
     this.mainEl = this.mainRef.current;
   }
-  
+
   componentDidUpdate(prevProps, prevState) {
     // Targeting the main content of the page
     const childLength = this.mainEl.children.length;
@@ -37,31 +37,29 @@ class Layout extends Component {
     // Only runs after initial page load...
     if(visibleChild && this.state.assetsLoaded && !prevState.assetsLoaded) {
       // Zoom-in page effect
-      const onPageLoadAnimTl = new TimelineMax();
+      const onPageLoadAnimTl = gsap.timeline();
       onPageLoadAnimTl
         .delay(0.2)
         .set(visibleChild, {z: -250})
-        .to(visibleChild, 1, {z: 0, ease: Power2.easeOut});
+        .to(visibleChild, {duration: 1, z: 0, ease: "power2.out"});
     }
 
     // Selects the main content of the page (not three.js background)
     if(this.visibleChildEl !== visibleChild && visibleChild) {
       this.visibleChildEl = visibleChild;
-      this.zoomTl = new TimelineMax({paused: true});
-      this.zoomTl.to(this.visibleChildEl, 0.75, {z: -400, ease: Power2.easeInOut});
+      this.zoomTl = gsap.timeline({paused: true});
+      this.zoomTl.to(this.visibleChildEl, {duration: 0.4, z: -400, ease: "power2.inOut"});
     }
-    
+
     // Id is either page route name or type name of children
-    const prevUniqueId = prevProps.uniqueKey  || prevProps.children.type;
-    const curUniqueId  = this.props.uniqueKey || this.props.children.type;
-    
-    // If route changes, set new child as current (this allows prev child to keep animating)
+    const prevUniqueId = prevProps.uniqueKey;
+    const curUniqueId  = this.props.uniqueKey;
+
+    // If route changes, store prev location for animation
     if(!_.isEqual(prevUniqueId, curUniqueId)) {
       this.setState({
-        curChild: this.props.children,
-        curUniqueId,
-        prevChild: prevProps.children,
-        prevUniqueId,
+        curLocation: this.props.location,
+        prevLocation: prevProps.location,
         pageAnimating: true,
         backgroundAnimating: true
       });
@@ -82,6 +80,9 @@ class Layout extends Component {
     if(this.props.navIsOpen && !prevProps.navIsOpen) {
       this.zoomOut();
     } else if(prevProps.navIsOpen && !this.props.navIsOpen) {
+      // Reset navZoomComplete when nav closes
+      this.setState({ navZoomComplete: false });
+
       const leaveAnim = this.props.routeAnim.leave;
       // If the leave animation is in/out AND page hasn't changed, zoom in
       if((leaveAnim === 'leaveIn' || leaveAnim === 'leaveOut') && leaveAnim === prevProps.routeAnim.leave) {
@@ -108,11 +109,15 @@ class Layout extends Component {
     this.setState({ backgroundAnimating: false });
   }
 
+  // Called when nav zoom out animation completes
+  onNavZoomComplete = () => {
+    this.setState({ navZoomComplete: true });
+  }
+
   // Callback is ran when page transition fully completes
   updateStateToNewChild = () => {
-    this.setState({ 
-      prevChild: null, 
-      prevUniqueId: null 
+    this.setState({
+      prevLocation: null
     });
 
     // Resets page transition callback function to null
@@ -121,17 +126,24 @@ class Layout extends Component {
 
   // Zooms out page
   zoomOut = () => {
-    this.zoomTl.progress(0).play();
+    if (this.zoomTl) {
+      this.zoomTl.progress(0).play();
+    }
   }
-  
+
   // Zooms in page
   zoomIn = () => {
-    this.zoomTl.progress(1).reverse();
+    if (this.zoomTl) {
+      this.zoomTl.progress(1).reverse();
+    }
   }
 
   render() {
-    const visibleChild = this.state.prevChild || this.state.curChild;
-    const content = this.state.assetsLoaded ? visibleChild : null;
+    const { children } = this.props;
+    const { assetsLoaded } = this.state;
+
+    // Let Routes render the current route - animations are handled by individual components
+    const content = assetsLoaded ? children : null;
     let landscapeModeWarning = null;
 
     if(this.state.assetsLoaded) {
@@ -144,13 +156,15 @@ class Layout extends Component {
     let threeJsBg = null;
     if(slides[this.props.page[0]]) {
       threeJsBg = (
-        <ThreeBg 
+        <ThreeBg
           page={this.props.page}
           routeAnim={this.props.routeAnim}
           animatingProject={this.props.animatingProject}
           scrollAmount={this.props.scrollAmount}
           changeScroll={this.props.changeScroll}
-          onAnimationFinished={this.bgAnimationFinishedHandler} />
+          onAnimationFinished={this.bgAnimationFinishedHandler}
+          onNavZoomComplete={this.onNavZoomComplete}
+          overlayRef={this.navOverlayRef} />
       );
     }
 
@@ -161,11 +175,13 @@ class Layout extends Component {
         <main ref={this.mainRef} className={c.Layout}>
           <Navigation
             page={this.props.page}
-            changeRouteAnim={this.props.changeRouteAnim} />
+            changeRouteAnim={this.props.changeRouteAnim}
+            navZoomComplete={this.state.navZoomComplete} />
           {threeJsBg}
           <div className={c.Layout__Main}>
             {content}
           </div>
+          <div ref={this.navOverlayRef} className={c.Layout__NavOverlay}></div>
         </main>
       </>
     );
@@ -190,6 +206,7 @@ Layout.propTypes = {
   images: PropTypes.objectOf(PropTypes.object),
   uniqueKey: PropTypes.string.isRequired,
   children: PropTypes.element.isRequired,
+  location: PropTypes.object.isRequired,
 };
 
 export default AnimatedSwitch(Layout);

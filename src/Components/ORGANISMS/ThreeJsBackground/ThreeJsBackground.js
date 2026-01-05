@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { TweenMax, TimelineMax, Expo, Power1, Power2, Elastic } from 'gsap';
+import gsap from 'gsap';
 import * as THREE from 'three';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
+import { withRouter } from '../../../Shared/withRouter';
 import c from './ThreeJsBackground.module.scss';
 import * as util from './utility';
 import * as u from '../../../Shared/utility';
@@ -15,7 +15,6 @@ import * as routeActions from '../../../Store/Actions/RouteActions';
 
 class ThreeJsBackground extends Component {
   threeWrapper  = React.createRef();
-  THREE         = THREE;
   memoizedShapeMaterials  = {};
   memoizedShapes          = {};
   memoizedNoiseBg     = null;
@@ -48,8 +47,8 @@ class ThreeJsBackground extends Component {
         // Smooth out animation for noise sphere when nav opens and disable mouse interaction...
         if(this._hasNoiseSphere && this.noiseTl) {
           this.noiseTl.clear();
-          this.noiseTl 
-            .to(this.uniformsNoiseSphere.amplitude, 1, {value: 2 * Math.sin(this.sphere.rotation.y * 0.125)})
+          this.noiseTl
+            .to(this.uniformsNoiseSphere.amplitude, {duration: 1, value: 2 * Math.sin(this.sphere.rotation.y * 0.125)})
             .call(() => (this._mouseIsMoving = false));
         }
         this.zoomOut();
@@ -69,12 +68,12 @@ class ThreeJsBackground extends Component {
   // INITIALIZE SCENE
   init() {
     // Set up three.js scene and camera
-    this.scene  = new this.THREE.Scene();    
-    this.camera = new this.THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+    this.scene  = new THREE.Scene();    
+    this.camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
     this.camera.position.z = this.cameraZ;
     
     // Set up renderer
-    this.renderer = new this.THREE.WebGLRenderer({ antialias: true, alpha: true });
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     this.renderer.setPixelRatio( window.devicePixelRatio );
     this.renderer.setSize( window.innerWidth, window.innerHeight );
     this.threeBackground.appendChild( this.renderer.domElement );
@@ -126,12 +125,13 @@ class ThreeJsBackground extends Component {
         // Runs after mouse interaction or scene change to smooth sphere transition
         if(!this.sphereAnimSmooth && !this.sphereIsTweening) {
           this.sphereIsTweening = true;
-          this.sphereTween = new TweenMax.to(amplitude, 3, {
-            value: 2 * Math.sin(this.sphere.rotation.y * 0.125)
-          });
-          this.sphereTween.eventCallback("onComplete", () => {
-            this.sphereAnimSmooth = true;
-            this.sphereIsTweening = false;
+          this.sphereTween = gsap.to(amplitude, {
+            duration: 3,
+            value: 2 * Math.sin(this.sphere.rotation.y * 0.125),
+            onComplete: () => {
+              this.sphereAnimSmooth = true;
+              this.sphereIsTweening = false;
+            }
           });
           // If the sphere is tweening, keep updating the end value
         } else if (this.sphereIsTweening) {
@@ -154,7 +154,7 @@ class ThreeJsBackground extends Component {
       for (let i = 0; i < this.displacementNoiseSphere.length; i++) {
         this.displacementNoiseSphere[i] = Math.sin(0.1 * i + time);
         this.noise[i] += 0.5 * (0.5 - Math.random());
-        this.noise[i] = this.THREE.Math.clamp(this.noise[i], - 5, 4);
+        this.noise[i] = THREE.Math.clamp(this.noise[i], - 5, 4);
         this.displacementNoiseSphere[i] += this.noise[i];
       }
       
@@ -237,18 +237,18 @@ class ThreeJsBackground extends Component {
   // INITIALIZING SCENE
   initCube() {
     // Cube is only used for manipulating the perspective of client's screen (and camera)
-    let geometry = new this.THREE.BoxBufferGeometry( 0.1, 0.1, 0.1 );
-    let material = new this.THREE.MeshBasicMaterial( { color: 0xffffff, transparent: true, opacity: 0} );
-    this.cube = new this.THREE.Mesh( geometry, material );
+    let geometry = new THREE.BoxBufferGeometry( 0.1, 0.1, 0.1 );
+    let material = new THREE.MeshBasicMaterial( { color: 0xffffff, transparent: true, opacity: 0} );
+    this.cube = new THREE.Mesh( geometry, material );
     this.cube.position.set( 0,0,0 );
   }
 
   // Creates and saves all shapes and backgrounds, and makes first scene...
   initBackground = (page) => {
-    this.memoizedLights   = util.createLights(this.THREE);    
-    const noiseSphereVars = util.createNoiseSphere(this.THREE);
-    const bgParticleVars  = util.createNoiseBgParticles(this.THREE, this.renderer);
-    this._shapesInit      = util.createShapes(this.THREE, this.memoizedShapes);
+    this.memoizedLights   = util.createLights(THREE);    
+    const noiseSphereVars = util.createNoiseSphere(THREE);
+    const bgParticleVars  = util.createNoiseBgParticles(THREE, this.renderer);
+    this._shapesInit      = util.createShapes(THREE, this.memoizedShapes);
 
     // Noise sphere variable initialization
     this.curTime = noiseSphereVars.curTime;
@@ -281,7 +281,7 @@ class ThreeJsBackground extends Component {
   // Sets bg color for page load...
   initBgColor = (page) => {
     const slide = slides[page];
-    TweenMax.set(this.threeBackground, { backgroundColor: slide[0].backgroundColor });
+    gsap.set(this.threeBackground, { backgroundColor: slide[0].backgroundColor });
   } 
   
   // START - ALL TRANSITION ANIMATIONS  
@@ -340,19 +340,19 @@ class ThreeJsBackground extends Component {
       if(type === 'appear') {
         timeline
           .set(animatingObjectsMaterial, {transparent: true, opacity: 0, overwrite: 'none'}, 0)
-          .staggerTo(animatingObjectsMaterial, 0.7, {opacity: 1, ease: Power2.easeIn, overwrite: 'none'}, 0, 0.65);
+          .to(animatingObjectsMaterial, {duration: 0.7, opacity: 1, ease: "power2.in", overwrite: 'none', stagger: 0}, 0.65);
 
         noiseObject && timeline
           .set(noiseObject.alpha, {value: 0}, 0)
-          .to(noiseObject.alpha, 0.7, {value: noiseValue, ease: Power2.easeIn}, 0.65);
+          .to(noiseObject.alpha, {duration: 0.7, value: noiseValue, ease: "power2.in"}, 0.65);
 
       } else if(type === 'leave') {
         timeline
           .set(animatingObjectsMaterial, {transparent: true}, 0)
-          .staggerTo(animatingObjectsMaterial, 0.6, {opacity: 0, ease: Power2.easeIn, overwrite: 'concurrent'}, 0, 0);
-        
+          .to(animatingObjectsMaterial, {duration: 0.6, opacity: 0, ease: "power2.in", overwrite: 'auto', stagger: 0}, 0);
+
         noiseObject && timeline
-          .to(noiseObject.alpha, 0.6, {value: 0, ease: Power2.easeIn}, 0);
+          .to(noiseObject.alpha, {duration: 0.6, value: 0, ease: "power2.in"}, 0);
       }
     }
   }
@@ -377,7 +377,7 @@ class ThreeJsBackground extends Component {
         // Reset amplitude smoothly...
         this.noiseTl.clear();
         this.noiseTl
-          .to(this.uniformsNoiseSphere.amplitude, 0.5, {value: 2 * Math.sin(this.sphere.rotation.y * 0.125)})
+          .to(this.uniformsNoiseSphere.amplitude, {duration: 0.5, value: 2 * Math.sin(this.sphere.rotation.y * 0.125)})
           .call(() => (this._mouseIsMoving = false));
       }
     }
@@ -387,9 +387,9 @@ class ThreeJsBackground extends Component {
     // Sets corresponding timelines with callbacks...
     if(type === 'appear') {
       this.clearScene();
-      this.tl = new TimelineMax({onComplete: this.slideArrivedHandler});
-    } else if(type === 'leave') {      
-      this.tl = new TimelineMax({onComplete: this.completeRouteAnimationHandler});
+      this.tl = gsap.timeline({onComplete: this.slideArrivedHandler});
+    } else if(type === 'leave') {
+      this.tl = gsap.timeline({onComplete: this.completeRouteAnimationHandler});
     } 
   }
 
@@ -397,21 +397,75 @@ class ThreeJsBackground extends Component {
   zoomOut = () => {
     this._zoomedOut = true;
     this.removeMouseMove();
-    const zPos = this._hasNoiseBg ? 18 : this._hasNoiseSphere ? 70 : 30;
-    
-    this.tl = new TimelineMax();
-    this.tl.to(this.camera.position, 0.7, {z: zPos, ease: Power2.easeInOut}, 0);
+    const zPos = this._hasNoiseBg ? 25 : this._hasNoiseSphere ? 90 : 45;
+
+    this.tl = gsap.timeline({
+      onComplete: () => {
+        if (this.props.onNavZoomComplete) {
+          this.props.onNavZoomComplete();
+        }
+      }
+    });
+    this.tl.to(this.camera.position, {duration: 0.4, z: zPos, ease: "power2.inOut"}, 0);
+    // Fade in black overlay
+    if (this.props.overlayRef && this.props.overlayRef.current) {
+      this.tl.to(this.props.overlayRef.current, {duration: 0.4, opacity: 1, ease: "power2.inOut"}, 0);
+    }
+
+    // Add opacity fade for noise sphere
+    if(this._hasNoiseSphere && this.uniformsNoiseSphere) {
+      this.tl.to(this.uniformsNoiseSphere.alpha, {duration: 0.4, value: 0, ease: "power2.out"}, 0);
+    }
+    // Add opacity fade for noise background particles
+    if(this._hasNoiseBg && this.uniformsNoiseBg) {
+      this.tl.to(this.uniformsNoiseBg.alpha, {duration: 0.4, value: 0, ease: "power2.out"}, 0);
+    }
+    // Fade out regular shapes
+    this.fadeSceneObjects(0, 0.4);
   }
-  
+
   // Zoom in scene
   zoomIn = (isRouteChange) => {
     this._zoomedOut = false;
-    this.tl = new TimelineMax();
-    this.tl.to(this.camera.position, 0.7, {z: this.cameraZ, ease: Power2.easeOut}, 0);
+    this.tl = gsap.timeline();
+    this.tl.to(this.camera.position, {duration: 0.7, z: this.cameraZ, ease: "power2.out"}, 0);
+    // Fade out black overlay
+    if (this.props.overlayRef && this.props.overlayRef.current) {
+      this.tl.to(this.props.overlayRef.current, {duration: 0.5, opacity: 0, ease: "power2.out"}, 0.2);
+    }
+
+    // Restore opacity for noise sphere
+    if(this._hasNoiseSphere && this.uniformsNoiseSphere) {
+      this.tl.to(this.uniformsNoiseSphere.alpha, {duration: 0.5, value: 1, ease: "power2.in"}, 0.2);
+    }
+    // Restore opacity for noise background particles
+    if(this._hasNoiseBg && this.uniformsNoiseBg) {
+      this.tl.to(this.uniformsNoiseBg.alpha, {duration: 0.5, value: 0.5, ease: "power2.in"}, 0.2);
+    }
+    // Fade in regular shapes
+    this.fadeSceneObjects(1, 0.5, 0.2);
 
     // If route is not changing, add mouse move after zoom in
     if(!isRouteChange) {
       this.tl.call(() => this.addMouseMove());
+    }
+  }
+
+  // Helper to fade scene objects (shapes) opacity
+  fadeSceneObjects = (targetOpacity, duration, delay = 0) => {
+    const shapeMaterials = [];
+    this.scene.traverse(node => {
+      if((node.isMesh || node.isPoints) && node.material && !node.name) {
+        shapeMaterials.push(node.material);
+      }
+    });
+    if(shapeMaterials.length > 0) {
+      gsap.to(shapeMaterials, {
+        duration: duration,
+        opacity: targetOpacity,
+        ease: targetOpacity === 0 ? "power2.out" : "power2.in",
+        delay: delay
+      });
     }
   }
 
@@ -436,18 +490,18 @@ class ThreeJsBackground extends Component {
     this.tl
       .set(this.camera.position,    {...params[direction].set}, 0)
       .set(this.cube.position,      {...params[direction].set}, 0)
-      .to(this.threeBackground, 1, {backgroundColor: bgColor, ease: Power1.easeInOut}, 0);
+      .to(this.threeBackground, {duration: 1, backgroundColor: bgColor, ease: "power1.inOut"}, 0);
 
     if(direction !== 'out' && direction !== 'in') {
       this.tl
         .delay(0.25)
-        .to(this.camera.position, 0.7, {...params[direction].to, ease: Power1.easeOut}, 0.65)
-        .to(this.cube.position, 0.7, {...params[direction].to, ease: Power1.easeOut}, 0.65);
+        .to(this.camera.position, {duration: 0.7, ...params[direction].to, ease: "power1.out"}, 0.65)
+        .to(this.cube.position, {duration: 0.7, ...params[direction].to, ease: "power1.out"}, 0.65);
     } else {
       this.tl
         .delay(0.25)
-        .to(this.camera.position, 1, {...params[direction].camTo, ease: Power1.easeOut}, 0.65)
-        .to(this.cube.position, 1, {...params[direction].to, ease: Power1.easeOut}, 0.65);
+        .to(this.camera.position, {duration: 1, ...params[direction].camTo, ease: "power1.out"}, 0.65)
+        .to(this.cube.position, {duration: 1, ...params[direction].to, ease: "power1.out"}, 0.65);
     }
 
     this.tweenAnimatingObjects(this.tl, animatingObjectsMaterial, 'appear');
@@ -471,8 +525,8 @@ class ThreeJsBackground extends Component {
     };
     
     this.tl
-      .to(this.camera.position, 0.6, {...params[direction].to, ease: Expo.easeIn}, 0)
-      .to(this.cube.position, 0.6,  {...params[direction].to, ease: Expo.easeIn}, 0)
+      .to(this.camera.position, {duration: 0.6, ...params[direction].to, ease: "expo.in"}, 0)
+      .to(this.cube.position, {duration: 0.6, ...params[direction].to, ease: "expo.in"}, 0)
 
     this.tweenAnimatingObjects(this.tl, animatingObjectsMaterial, 'leave');
   }
@@ -537,12 +591,12 @@ class ThreeJsBackground extends Component {
         // Change scrolled amount to new amount
         this.props.changeScroll(newScrollAmount);
         this.projectIsMouseScrollSliding = true;
-        
+
         // Slide horizontally by new scroll amount
-        TweenMax.killTweensOf(this.camera.position, {x: true});
-        TweenMax.killTweensOf(this.cube.position, {x: true});
-        TweenMax.to(this.camera.position, 0.5, {x: newScrollAmount, ease: Power1.EaseOut});
-        TweenMax.to(this.cube.position, 0.5, {x: newScrollAmount, ease: Power1.EaseOut});
+        gsap.killTweensOf(this.camera.position, "x");
+        gsap.killTweensOf(this.cube.position, "x");
+        gsap.to(this.camera.position, {duration: 0.5, x: newScrollAmount, ease: "power1.out"});
+        gsap.to(this.cube.position, {duration: 0.5, x: newScrollAmount, ease: "power1.out"});
       }
     }
   }
@@ -550,23 +604,23 @@ class ThreeJsBackground extends Component {
   gyroscopeHandler = (e) => {
     const xAxisPos = e.beta;
     const yAxisPos = e.gamma;
-    
+
     const xRatio = ((xAxisPos - 40) / 60).toFixed(2);
     const yRatio = (yAxisPos / 35).toFixed(2);
-    
+
     let xCamPos = (yRatio*Math.PI*0.5).toFixed(4);
     let yCamPos = (-xRatio*Math.PI*0.5).toFixed(4);
-    
+
     // If the current page doesnt have bg noise particles...
     if(!this._hasNoiseBg) {
       // Move around bg following the mouse
       if(!this.projectIsMouseScrollSliding) {
-        TweenMax.killTweensOf(this.camera.position, {x: true});
-        TweenMax.to(this.camera.position, 0.75, {x: xCamPos});
+        gsap.killTweensOf(this.camera.position, "x");
+        gsap.to(this.camera.position, {duration: 0.75, x: xCamPos});
       }
-      
-      TweenMax.killTweensOf(this.camera.position, {y: true});
-      TweenMax.to(this.camera.position, 0.75, {y: yCamPos});
+
+      gsap.killTweensOf(this.camera.position, "y");
+      gsap.to(this.camera.position, {duration: 0.75, y: yCamPos});
     }
   }
 
@@ -575,26 +629,26 @@ class ThreeJsBackground extends Component {
     if(u.isWindowDesktop()) {
       const xNormalized = +( e.clientX / window.innerWidth).toFixed(3) - 0.5,
             yNormalized = +(-e.clientY / window.innerHeight).toFixed(3) + 0.5;
-      
+
       let xCamPos = (-xNormalized*Math.PI*0.65).toFixed(2);
       let yCamPos = (-yNormalized*Math.PI*0.65).toFixed(2);
-      
+
       // If the current page doesnt have bg noise particles...
       if(!this._hasNoiseBg) {
         // Move around bg following the mouse
         if(!this.projectIsMouseScrollSliding) {
-          TweenMax.killTweensOf(this.camera.position, {x: true});
-          TweenMax.to(this.camera.position, 1.5, {x: xCamPos});
+          gsap.killTweensOf(this.camera.position, "x");
+          gsap.to(this.camera.position, {duration: 1.5, x: xCamPos});
         }
-        
-        TweenMax.killTweensOf(this.camera.position, {y: true});
-        TweenMax.to(this.camera.position, 1.5, {y: yCamPos});
+
+        gsap.killTweensOf(this.camera.position, "y");
+        gsap.to(this.camera.position, {duration: 1.5, y: yCamPos});
       }
-      
+
       // If nav is closed...
       if(!this.props.navIsOpen) {
         this.noiseTl && this.noiseTl.clear();
-        this.noiseTl = new TimelineMax();
+        this.noiseTl = gsap.timeline();
 
         // For Noise Sphere
         if(this._hasNoiseSphere) {
@@ -602,10 +656,10 @@ class ThreeJsBackground extends Component {
           // Calculates mouse position relative to radius from center of screen
           const mouseRadius = this.calcMousePosRadius(e, 1);
           this.noiseTl
-            .to(this.uniformsNoiseSphere.amplitude, 0.25, {value: mouseRadius * 1.55})
+            .to(this.uniformsNoiseSphere.amplitude, {duration: 0.25, value: mouseRadius * 1.55})
             .call(() => (this._mouseIsMoving = false))
-            .to(this.camera.position, 1, {x: 0, y: 0, ease: Power2.easeIn});
-        } 
+            .to(this.camera.position, {duration: 1, x: 0, y: 0, ease: "power2.in"});
+        }
       }
     }
   };
@@ -645,18 +699,18 @@ class ThreeJsBackground extends Component {
       // Runs if smoothed animation finished for noise background...
       if(this._noiseBgInit && !this.bgAnimating) {
         this.variablePosition.material.uniforms.delta.value = Math.min(this.delta/3, 0.5); 
-        this.uniformsNoiseBg.hue1.value = this.THREE.Math.clamp(Math.sin(this.random[0]), -0.45, 0.45);
-        this.uniformsNoiseBg.hue2.value = this.THREE.Math.clamp(Math.sin(this.random[1]), -0.45, 0.45);
-        this.uniformsNoiseBg.hue3.value = this.THREE.Math.clamp(Math.sin(this.random[2]), -0.45, 0.45);
+        this.uniformsNoiseBg.hue1.value = THREE.Math.clamp(Math.sin(this.random[0]), -0.45, 0.45);
+        this.uniformsNoiseBg.hue2.value = THREE.Math.clamp(Math.sin(this.random[1]), -0.45, 0.45);
+        this.uniformsNoiseBg.hue3.value = THREE.Math.clamp(Math.sin(this.random[2]), -0.45, 0.45);
         // On first landing on noise bg page...
       } else if(!this._noiseBgInit) {
-        const noiseBgTl = new TimelineMax();
+        const noiseBgTl = gsap.timeline();
         noiseBgTl
-          .to(this.variablePosition.material.uniforms.delta, 1, {value: Math.min(this.delta/3, 0.5), ease: Elastic.easeIn})
+          .to(this.variablePosition.material.uniforms.delta, {duration: 1, value: Math.min(this.delta/3, 0.5), ease: "elastic.in"})
           .call(() => (this._noiseBgInit = true))
-          .to(this.uniformsNoiseBg.hue1, 3, {value: this.THREE.Math.clamp(Math.sin(this.random[0]), -0.45, 0.45)}, 0)  
-          .to(this.uniformsNoiseBg.hue2, 3, {value: this.THREE.Math.clamp(Math.sin(this.random[1]), -0.45, 0.45)}, 0)  
-          .to(this.uniformsNoiseBg.hue3, 3, {value: this.THREE.Math.clamp(Math.sin(this.random[2]), -0.45, 0.45)}, 0);
+          .to(this.uniformsNoiseBg.hue1, {duration: 3, value: THREE.Math.clamp(Math.sin(this.random[0]), -0.45, 0.45)}, 0)
+          .to(this.uniformsNoiseBg.hue2, {duration: 3, value: THREE.Math.clamp(Math.sin(this.random[1]), -0.45, 0.45)}, 0)
+          .to(this.uniformsNoiseBg.hue3, {duration: 3, value: THREE.Math.clamp(Math.sin(this.random[2]), -0.45, 0.45)}, 0);
       }
 
       this.particles.material.uniforms.texturePosition.value = this.gpuComputationRenderer
@@ -713,7 +767,7 @@ class ThreeJsBackground extends Component {
     window.removeEventListener( 'deviceorientation', this.gyroscopeHandler );
   }
 
-  render() { 
+  render() {
     return <div className={c.ThreeJsBackground} ref={this.threeWrapper}></div>;
   }
 }
@@ -730,7 +784,8 @@ ThreeJsBackground.propTypes = {
   }).isRequired,
   scrollAmount: PropTypes.number.isRequired,
   changeScroll: PropTypes.func.isRequired,
-  onAnimationFinished: PropTypes.func.isRequired
+  onAnimationFinished: PropTypes.func.isRequired,
+  onNavZoomComplete: PropTypes.func
 };
 
 const mapStateToProps = state => {

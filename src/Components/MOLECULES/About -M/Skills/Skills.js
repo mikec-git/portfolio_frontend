@@ -4,7 +4,7 @@ import Skill from '../../../ATOMS/About -A/Skill/Skill';
 import c from './Skills.module.scss';
 import * as u from '../../../../Shared/utility';
 
-const skills = (props) => {
+const Skills = (props) => {
   const languages = [];
   const libraries = [];
   const tech      = [];
@@ -93,8 +93,8 @@ const skills = (props) => {
   );
 }
 
-skills.propTypes = {
+Skills.propTypes = {
   images: PropTypes.objectOf(PropTypes.object).isRequired
 }
- 
-export default skills;
+
+export default Skills;

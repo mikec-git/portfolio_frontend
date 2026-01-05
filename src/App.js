@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { Route, withRouter, Redirect } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { connect } from 'react-redux';
 import memoizeOne from 'memoize-one';
 import _ from 'lodash';
 
+import { withRouter } from './Shared/withRouter';
 import Layout from './HOC/Layout/Layout';
 import Landing from './Containers/Landing/Landing';
 import Portfolio from './Containers/Portfolio/Portfolio';
@@ -116,14 +117,14 @@ class App extends Component {
   }
   
   render() {
-    const { history, location } = this.props;
+    const { location } = this.props;
     const { currentPage }       = this;
     const newPage = u.splitPathname(location.pathname);
     const from    = currentPage[0];
     const to      = newPage[0];
-    
-    // When hitting browser back button ...
-    if(history.action === 'POP' && u.isArrayGt(currentPage, 0) && from !== to) {
+
+    // When hitting browser back button - check via navigation type
+    if(u.isArrayGt(currentPage, 0) && from !== to) {
       this.changeRouteAnimationHandler(from, to);
       this.backButtonHit = true;
     }
@@ -134,44 +135,38 @@ class App extends Component {
     // Need to manually redirect due to AnimatedSwitch and Layout render setup...
     // IF path exists in slides AND if subroutes in the pathname...
     // OR if root path doesnt exist in slides...
-    let redirect = null;
     let pageName = this.currentPage[0];
     if((slides[pageName] && this.currentPage.length > 1) || !slides[pageName]) {
-      let redirectPath = null;
-      redirectPath = !slides[pageName] ? '/' : `/${pageName}`;
-      redirect = <Redirect to={redirectPath} />;
-    } 
+      let redirectPath = !slides[pageName] ? '/' : `/${pageName}`;
+      return <Navigate to={redirectPath} replace />;
+    }
 
     return (
-      <>      
-        {redirect ? redirect : <Layout 
-          page={this.currentPage}
-          routeAnim={this.currentAnim}  
-          setPageAnimationCallback={this.setPageAnimationCallbackHandler}
-          changeScroll={this.changeScrollAmountHandler}
-          changeRouteAnim={this.changeRouteAnimationHandler}
-          animatingProject={this.state.animatingProject}
-          scrollAmount={this.state.scrollAmount}
-          navIsOpen={this.props.navIsOpen}
-          images={this.props.images} >
-          <Route 
-            exact
-            path='/' 
-            render={ props => (
-              <Landing 
-                {...props} 
+      <Layout
+        page={this.currentPage}
+        routeAnim={this.currentAnim}
+        setPageAnimationCallback={this.setPageAnimationCallbackHandler}
+        changeScroll={this.changeScrollAmountHandler}
+        changeRouteAnim={this.changeRouteAnimationHandler}
+        animatingProject={this.state.animatingProject}
+        scrollAmount={this.state.scrollAmount}
+        navIsOpen={this.props.navIsOpen}
+        images={this.props.images} >
+        <Routes>
+          <Route
+            path='/'
+            element={
+              <Landing
                 page={this.currentPage}
                 routeAnim={this.currentAnim}
                 changeRouteAnim={this.changeRouteAnimationHandler}
                 animationCallback={this.state.pageAnimationCallback}
                 navIsOpen={this.props.navIsOpen} />
-            )} />
-          <Route 
-            exact
-            path='/portfolio' 
-            render={ props => (
-              <Portfolio 
-                {...props} 
+            } />
+          <Route
+            path='/portfolio'
+            element={
+              <Portfolio
                 navIsOpen={this.props.navIsOpen}
                 page={this.currentPage}
                 routeAnim={this.currentAnim}
@@ -180,22 +175,20 @@ class App extends Component {
                 animationCallback={this.state.pageAnimationCallback}
                 changeScroll={this.changeScrollAmountHandler}
                 changeAnimatingProject={this.changeAnimatingProjectHandler} />
-            )} />
-          <Route 
-            exact
-            path='/about' 
-            render={ props => (
-              <About 
-                {...props} 
+            } />
+          <Route
+            path='/about'
+            element={
+              <About
                 page={this.currentPage}
                 navIsOpen={this.props.navIsOpen}
                 routeAnim={this.currentAnim}
                 animationCallback={this.state.pageAnimationCallback}
                 addFocus={this.addDragFocus}
                 removeFocus={this.removeDragFocus} />
-            )} />
-        </Layout>}
-      </>
+            } />
+        </Routes>
+      </Layout>
     );
   }
 }

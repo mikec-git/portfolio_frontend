@@ -7,9 +7,23 @@
   @media only screen and (max-width: 1000px) and (max-height: 800px) and (orientation: landscape) and (min-resolution: 150dpi) {
     display: none;
   }
-  
+
   &__Main {
+    position: relative;
+    width: 100%;
     backface-visibility: hidden;
     perspective: 80rem;
+  }
+
+  &__NavOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000000;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 100;
   }
 }

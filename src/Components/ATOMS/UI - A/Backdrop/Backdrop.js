@@ -9,7 +9,7 @@ const backdrop = (props) => {
       in={props.isOpen}
       mountOnEnter
       unmountOnExit
-      timeout={950}
+      timeout={400}
       classNames={{
         enter: c.Backdrop_enter,
         enterActive: c.Backdrop_enter_active,

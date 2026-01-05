@@ -1,8 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { CSSTransition } from 'react-transition-group';
-import { Expo, TimelineMax } from 'gsap';
-import * as assetsLoader from 'assets-loader';
+import gsap from 'gsap';
 import PropTypes from 'prop-types';
 
 import ProgressLogo from '../ProgressLogo/ProgressLogo';
@@ -16,11 +15,12 @@ class ProgressBar extends PureComponent {
     smoothLoadComplete: false,
     isMounted: true,
     progress: 0,
-    smoothProgress: 0
+    smoothProgress: 0.99
   }
 
   barRef  = React.createRef();
   logoRef = React.createRef();
+  nodeRef = React.createRef();
   animFrameId = null;
 
   componentDidMount() { 
@@ -45,10 +45,10 @@ class ProgressBar extends PureComponent {
       cancelAnimationFrame(this.animFrameId);
       // Sets progress to 100% and calls layout's assetsLoaded()  to load visible child...
       this.setState({ smoothProgress: 1, smoothLoadComplete: true }, () => {
-        const progressTl = new TimelineMax();
+        const progressTl = gsap.timeline();
         progressTl
           .set(this.barEl, {transformOrigin: 'center'})
-          .to(this.barEl, 1, {scaleX: 0, ease: Expo.easeInOut})
+          .to(this.barEl, {duration: 1, scaleX: 0, ease: "expo.inOut"})
           .call(() => this.setState({ isMounted: false }));
       });
     }
@@ -105,19 +105,20 @@ class ProgressBar extends PureComponent {
     const { isMounted, smoothProgress } = this.state;
     const smoothPercentage = (smoothProgress*100).toFixed();
 
-    return ( 
+    return (
       <CSSTransition
         in={isMounted}
         mountOnEnter
         unmountOnExit
         timeout={750}
+        nodeRef={this.nodeRef}
         classNames={{
           exit: c.ProgressBar_exit,
           exitActive: c.ProgressBar_exit_active,
           exitDone: c.ProgressBar_exit_done,
         }}
         onExiting={this.props.assetsLoaded} >
-        <div className={c.ProgressBar}>
+        <div ref={this.nodeRef} className={c.ProgressBar}>
           <span className={c.ProgressBar__Percent}>
             {smoothPercentage}
           </span>

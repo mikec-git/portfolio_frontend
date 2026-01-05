@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { TimelineMax, Expo, Power2, TweenMax } from 'gsap';
+import gsap from 'gsap';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
@@ -43,9 +43,9 @@ class About extends Component {
     this.addEvents();
 
     // Specific zoom out/in tweens for nav open
-    this.zoomTweensTo = new TimelineMax({paused: true});
+    this.zoomTweensTo = gsap.timeline({paused: true});
     this.zoomTweensTo
-      .to(this.aboutEl, 0.5, {autoAlpha: 0, ease: Power2.easeOut}, 0);
+      .to(this.aboutEl, {duration: 0.5, autoAlpha: 0, ease: "power2.out"}, 0);
 
     // Initially set contact page to be invisible
     // TweenMax.set(this.contactEl, {autoAlpha: 0});
@@ -53,7 +53,7 @@ class About extends Component {
 
   componentWillUnmount() {
     this._isMounted = false;
-    this.props.animationCallback();
+    this.props.animationCallback && this.props.animationCallback();
     this.props.removeFocus();
     this.removeEvents();
   }
@@ -94,7 +94,7 @@ class About extends Component {
 
   // When component leave anim finished...
   onCompleteHandlerLeave = () => {
-    this.props.animationCallback();
+    this.props.animationCallback && this.props.animationCallback();
     this._isMounted && this.setState({ animating: false });
   }
 
@@ -107,9 +107,9 @@ class About extends Component {
   createNewTimeline = (type) => {
     this.tl && this.tl.clear();
     if(type === 'appear') {
-      this.tl = new TimelineMax({onComplete: this.onCompleteHandlerArrive});
+      this.tl = gsap.timeline({onComplete: this.onCompleteHandlerArrive});
     } else if(type === 'leave') {
-      this.tl = new TimelineMax({onComplete: this.onCompleteHandlerLeave});
+      this.tl = gsap.timeline({onComplete: this.onCompleteHandlerLeave});
     }
   }
 
@@ -128,18 +128,15 @@ class About extends Component {
     this.tl
       .set(this.aboutContentEl, {...params[direction].main.set})
       .set(this.contactLinksEl, {autoAlpha: 0}, 0)
-      // .set(this.toggleBottomEl, {autoAlpha: 0}, 0)
 
-      .to(this.aboutContentEl, 0.8, {...params[direction].main.to, ease: Expo.easeOut}, 0)
-      .to(this.aboutContentEl, 0.8, {autoAlpha: 1, ease: Expo.easeIn}, 0)
-      .to(this.contactLinksEl, 0.5, {autoAlpha: 1, ease: Expo.easeIn}, 0.65 + 0.3)
-      // .to(this.toggleBottomEl, 1, {autoAlpha: 1, ease: Expo.easeIn});
+      .to(this.aboutContentEl, {duration: 0.8, ...params[direction].main.to, ease: "expo.out"}, 0)
+      .to(this.aboutContentEl, {duration: 0.8, autoAlpha: 1, ease: "expo.in"}, 0)
+      .to(this.contactLinksEl, {duration: 0.5, autoAlpha: 1, ease: "expo.in"}, 0.65 + 0.3);
   }
 
   // Leave animation during route change...
   leaveTweens = (direction) => {
     this.createNewTimeline('leave');
-    const autoAlphaEaseOut = {autoAlpha: 0, ease: Expo.easeOut};
     const params = {
       in: {
         main: {z: -400}
@@ -147,20 +144,14 @@ class About extends Component {
     };
 
     this.tl
-      .to(this.aboutContentEl, 0.8, {...params[direction].main, ease: Expo.easeIn}, 0)
-      .to(this.aboutContentEl, 1.25, {...autoAlphaEaseOut}, 0);
+      .to(this.aboutContentEl, {duration: 0.8, ...params[direction].main, ease: "expo.in"}, 0)
+      .to(this.aboutContentEl, {duration: 1.25, autoAlpha: 0, ease: "expo.out"}, 0);
 
       if(this.state.pageState === 'about') {
         this.tl
-          .staggerTo(this.aboutContentEl.children, 0.8, {z: -400, ease: Expo.easeIn}, 0, 0)
-          .to(this.contactLinksEl, 0.75, {...autoAlphaEaseOut}, 0)
-          // .to(this.toggleBottomEl, 1, {...autoAlphaEaseOut}, 0);
-      } else {
-        // this.tl
-        //   .to(this.contactEl, 0.8, {...params[direction].main, ease: Expo.easeIn},0)
-        //   .to(this.contactEl, 1, {...autoAlphaEaseOut},0)
-        //   .to(this.toggleTopEl, 0.8, {...autoAlphaEaseOut}, 0);
-    }
+          .to(this.aboutContentEl.children, {duration: 0.8, z: -400, ease: "expo.in", stagger: 0}, 0)
+          .to(this.contactLinksEl, {duration: 0.75, autoAlpha: 0, ease: "expo.out"}, 0);
+      }
   }
 
   appearOut = () => {
@@ -175,7 +166,7 @@ class About extends Component {
   initSlide = () => {
     this._isSliding = true;
     this.slideTl && this.slideTl.clear();
-    this.slideTl = new TimelineMax();
+    this.slideTl = gsap.timeline();
   }
 
   // Slides page up to reveal contact page...
@@ -238,10 +229,7 @@ class About extends Component {
   }
 
   onPageResize = () => {
-    // TweenMax.set(this.toggleTopEl, {clearProps: 'all'});
-    // TweenMax.set(this.toggleBottomEl, {clearProps: 'all'});
-    TweenMax.set(this.aboutContentEl, {clearProps: 'all'});
-    // TweenMax.set(this.contactEl, {clearProps: 'all'});
+    gsap.set(this.aboutContentEl, {clearProps: 'all'});
 
     if(this.state.pageState === 'about') {
       this.slideDown();

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
 import { CSSTransition } from 'react-transition-group';
 import PropTypes from 'prop-types';
 
@@ -216,4 +215,4 @@ const mapDispatchToProps = dispatch => {
   }
 }
  
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(contactForm));
+export default connect(mapStateToProps, mapDispatchToProps)(contactForm);

@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import { TimelineMax, TweenMax, Expo, Power1, Power2 } from 'gsap';
+import gsap from 'gsap';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import Logo from '../../Components/ATOMS/UI - A/Logo/Logo';
 import Hammer from 'hammerjs';
 
+import { withRouter } from '../../Shared/withRouter';
 import TitleMain from '../../Components/ATOMS/UI - A/TitleMain/TitleMain';
 import TitleSecondary from '../../Components/ATOMS/UI - A/TitleSecondary/TitleSecondary';
 import LandingBtn from '../../Components/ATOMS/Landing - A/LandingBtn/LandingBtn';
@@ -63,7 +64,7 @@ class Landing extends Component {
   componentWillUnmount() {
     this._isMounted = false;
     // Resets layout prevChild to null
-    this.props.animationCallback();
+    this.props.animationCallback && this.props.animationCallback();
     this.removeMouseMove();
     this.removeEvents();
   }
@@ -85,14 +86,14 @@ class Landing extends Component {
       // If the nav is open, remove mouse move
       if(navIsOpen && !prevNavIsOpen) {
         this.removeMouseMove();
-        TweenMax.to(this.landingBtnEl, 1, {opacity: 0, ease: Expo.easeOut});
-      } 
+        gsap.to(this.landingBtnEl, {duration: 1, opacity: 0, ease: "expo.out"});
+      }
       // Otherwise...
     } else {
       // If the nav is closed, add mouse move
       if(!navIsOpen && prevNavIsOpen) {
         this.addMouseMove();
-        TweenMax.to(this.landingBtnEl, 1, {opacity: 1, ease: Expo.easeIn});
+        gsap.to(this.landingBtnEl, {duration: 1, opacity: 1, ease: "expo.in"});
       }
     } 
   }
@@ -117,7 +118,7 @@ class Landing extends Component {
   
   // If component leave anim finished...
   onCompleteHandlerLeave = () => {
-    this.props.animationCallback();
+    this.props.animationCallback && this.props.animationCallback();
     this._isMounted && this.setState({ animating: false });
   }
   
@@ -145,10 +146,10 @@ class Landing extends Component {
   }
   
   // General route change for scroll
-  changeToPortfolioHandler = (e) => { 
+  changeToPortfolioHandler = (e) => {
     this.routeChangeHandler(e, 'portfolio');
     if(!this.routeChangedScrolling) {
-      this.props.history.push('/portfolio');
+      this.props.navigate('/portfolio');
       this.routeChangedScrolling = true;
     }
   }
@@ -157,9 +158,9 @@ class Landing extends Component {
   createNewTimeline = (type) => {
     this.tl && this.tl.clear();
     if(type === 'appear') {
-      this.tl = new TimelineMax({onComplete: this.onCompleteHandlerArrive});
+      this.tl = gsap.timeline({onComplete: this.onCompleteHandlerArrive});
     } else if(type === 'leave') {
-      this.tl = new TimelineMax({onComplete: this.onCompleteHandlerLeave});
+      this.tl = gsap.timeline({onComplete: this.onCompleteHandlerLeave});
     }
   }
 
@@ -204,13 +205,13 @@ class Landing extends Component {
       .set(this.landingBtnEl,       {autoAlpha: 0}, 0)
       .set(this.eyesEl,             {autoAlpha: 0}, 0)
       .set(this.landingEl,          {rotationX: 0, rotationY: 0}, 0)
-      
-      .staggerTo(this.mainChildren, 0.8, {...params[direction].main.to, ease: Power1.easeOut}, 0.03, 0.65)
-      .staggerTo(this.secondaryChildren, 0.8, {...params[direction].second.to, ease: Power1.easeOut}, 0.03, 0.65 + 0.2)
-      .to(this.logoEl, 0.8, {...params[direction].logo.to, ease: Power1.easeOut}, 0.65)
+
+      .to(this.mainChildren, {duration: 0.8, ...params[direction].main.to, ease: "power1.out", stagger: 0.03}, 0.65)
+      .to(this.secondaryChildren, {duration: 0.8, ...params[direction].second.to, ease: "power1.out", stagger: 0.03}, 0.65 + 0.2)
+      .to(this.logoEl, {duration: 0.8, ...params[direction].logo.to, ease: "power1.out"}, 0.65)
       .call(() => (this.toggleReady = true))
-      .to(this.landingBtnEl, .75, {autoAlpha: 1, ease: Power1.easeOut}, '+=0')
-      .to(this.eyesEl, 1, {autoAlpha: 1, ease: Power1.easeIn}, '-=0.5');
+      .to(this.landingBtnEl, {duration: 0.75, autoAlpha: 1, ease: "power1.out"}, '+=0')
+      .to(this.eyesEl, {duration: 1, autoAlpha: 1, ease: "power1.in"}, '-=0.5');
   }
 
   // Tweens for component leaving...
@@ -230,14 +231,14 @@ class Landing extends Component {
     };
     
     // To allow for earlier route change into portfolio via scroll
-    this.toggleReady = false; 
+    this.toggleReady = false;
 
     this.tl
-      .to(this.landingEl, 0.6, {rotationX: 0, rotationY: 0}, 'landing')
-      .to(this.logoEl, 0.6, {...params[direction].logo, ease: Expo.easeIn, overwrite: 'all'}, 'landing')
-      .staggerTo(this.mainChildren, 0.6, {...params[direction].main, ease: Expo.easeIn, overwrite: 'concurrent'}, 0.01, 0)
-      .staggerTo(this.secondaryChildren, 0.6, {...params[direction].second, ease: Expo.easeIn, overwrite: 'concurrent'}, 0.01, 0)
-      .to(this.landingBtnEl, .65, {autoAlpha: 0, ease: Power1.easeOut, overwrite: 'concurrent'}, 'landing+=0.1');
+      .to(this.landingEl, {duration: 0.6, rotationX: 0, rotationY: 0}, 'landing')
+      .to(this.logoEl, {duration: 0.6, ...params[direction].logo, ease: "expo.in", overwrite: 'auto'}, 'landing')
+      .to(this.mainChildren, {duration: 0.6, ...params[direction].main, ease: "expo.in", overwrite: 'auto', stagger: 0.01}, 0)
+      .to(this.secondaryChildren, {duration: 0.6, ...params[direction].second, ease: "expo.in", overwrite: 'auto', stagger: 0.01}, 0)
+      .to(this.landingBtnEl, {duration: 0.65, autoAlpha: 0, ease: "power1.out", overwrite: 'auto'}, 'landing+=0.1');
   }
 
   appearTop = () => {
@@ -284,15 +285,16 @@ class Landing extends Component {
     if(u.isWindowMobile()) {
       const xAxisPos = e.beta;
       const yAxisPos = e.gamma;
-      
+
       const xRatio = ((xAxisPos - 40) / 60).toFixed(2);
       const yRatio = (yAxisPos / 35).toFixed(2);
-      
-      TweenMax.killTweensOf(this.landingEl, { rotationX: true, rotationY: true });
-      TweenMax.to(this.landingEl, 0.75, { 
-        rotationX: 5 * xRatio, 
+
+      gsap.killTweensOf(this.landingEl, "rotationX,rotationY");
+      gsap.to(this.landingEl, {
+        duration: 0.75,
+        rotationX: 5 * xRatio,
         rotationY: 5 * -yRatio,
-        ease: Power1.easeOut
+        ease: "power1.out"
       });
     }
   }
@@ -302,15 +304,15 @@ class Landing extends Component {
     if(u.isWindowDesktop()) {
       const xPos = e.clientX;
       const yPos = e.clientY;
-  
+
       const xRatio = ((xPos - (window.innerWidth/2)) / (window.innerWidth/2)).toFixed(2);
       const yRatio = ((yPos - (window.innerHeight/2)) / (window.innerHeight/2)).toFixed(2);
-  
+
       this.mouseTl && this.mouseTl.clear();
-      this.mouseTl = new TimelineMax();
+      this.mouseTl = gsap.timeline();
       this.mouseTl
-        .to(this.landingEl, 1, {rotationX: -13*yRatio, rotationY: 15*xRatio, ease: Power1.easeOut})
-        .to(this.landingEl, 1, {rotationX: 0, rotationY: 0, ease: Power2.easeIn});
+        .to(this.landingEl, {duration: 1, rotationX: -13*yRatio, rotationY: 15*xRatio, ease: "power1.out"})
+        .to(this.landingEl, {duration: 1, rotationX: 0, rotationY: 0, ease: "power2.in"});
     }
   }
 
@@ -364,4 +366,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, null)(Landing);
+export default withRouter(connect(mapStateToProps, null)(Landing));
