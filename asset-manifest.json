@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.7a10bf9a.css",
-    "main.js": "/static/js/main.13254712.js",
+    "main.js": "/static/js/main.e7a01579.js",
     "static/media/camping-tree.png": "/static/media/camping-tree.4e22c9801895d74dd2cd.png",
     "static/media/nature-flower.png": "/static/media/nature-flower.5e442f9f640a729bd493.png",
     "static/media/personal-fire.png": "/static/media/personal-fire.21755cdf03a9442680e1.png",
@@ -77,10 +77,10 @@
     "static/media/F14-Passport_js.svg": "/static/media/F14-Passport_js.264fc999713119132df7.svg",
     "static/media/angle-arrow.svg": "/static/media/angle-arrow.cc2cb2b788314ce7b2d5db598ae4c725.svg",
     "main.7a10bf9a.css.map": "/static/css/main.7a10bf9a.css.map",
-    "main.13254712.js.map": "/static/js/main.13254712.js.map"
+    "main.e7a01579.js.map": "/static/js/main.e7a01579.js.map"
   },
   "entrypoints": [
     "static/css/main.7a10bf9a.css",
-    "static/js/main.13254712.js"
+    "static/js/main.e7a01579.js"
   ]
 }
