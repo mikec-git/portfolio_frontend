@@ -30,11 +30,14 @@ class ThreeJsBackground extends Component {
 
   componentDidUpdate(prevProps) {
     const { page, routeAnim, animatingProject: { id, anim }, navIsOpen } = this.props;
-    const { page: prevPage, animatingProject: { id: prevId }, navIsOpen: prevNavIsOpen } = prevProps;
+    const { page: prevPage, routeAnim: prevRouteAnim, animatingProject: { id: prevId }, navIsOpen: prevNavIsOpen } = prevProps;
 
-    // If route is changing...
-    if(!_.isEqual(page, prevPage) && routeAnim.leave) {
-      const from = prevPage[0];
+    // If route is changing (page changed OR routeAnim.leave was just set)...
+    const pageChanged = !_.isEqual(page, prevPage);
+    const leaveAnimSet = routeAnim.leave && routeAnim.leave !== prevRouteAnim.leave;
+
+    if((pageChanged || leaveAnimSet) && routeAnim.leave && !this.bgAnimating) {
+      const from = page[0];
       this[routeAnim.leave](from);
       // If project is changing on portfolio page...
     } else if(page[0] === 'portfolio' && id.from !== prevId.from && anim.leave) {
@@ -347,12 +350,16 @@ class ThreeJsBackground extends Component {
           .to(noiseObject.alpha, {duration: 0.7, value: noiseValue, ease: "power2.in"}, 0.65);
 
       } else if(type === 'leave') {
-        timeline
-          .set(animatingObjectsMaterial, {transparent: true}, 0)
-          .to(animatingObjectsMaterial, {duration: 0.6, opacity: 0, ease: "power2.in", overwrite: 'auto', stagger: 0}, 0);
+        // Only fade particles if NOT using the overlay fade-to-black effect
+        // When overlay is used, particles stay visible and get covered by overlay
+        if (!this.props.overlayRef) {
+          timeline
+            .set(animatingObjectsMaterial, {transparent: true}, 0)
+            .to(animatingObjectsMaterial, {duration: 0.6, opacity: 0, ease: "power2.in", overwrite: 'auto', stagger: 0}, 0);
 
-        noiseObject && timeline
-          .to(noiseObject.alpha, {duration: 0.6, value: 0, ease: "power2.in"}, 0);
+          noiseObject && timeline
+            .to(noiseObject.alpha, {duration: 0.6, value: 0, ease: "power2.in"}, 0);
+        }
       }
     }
   }
@@ -511,6 +518,11 @@ class ThreeJsBackground extends Component {
     }
 
     this.tweenAnimatingObjects(this.tl, animatingObjectsMaterial, 'appear');
+
+    // Fade out black overlay when page appears
+    if (this.props.overlayRef && this.props.overlayRef.current) {
+      this.tl.to(this.props.overlayRef.current, {duration: 0.5, opacity: 0, ease: "power2.out"}, 0.2);
+    }
   }
 
   // Runs tweens for each leave direction and origin page
@@ -531,10 +543,15 @@ class ThreeJsBackground extends Component {
     };
     
     this.tl
-      .to(this.camera.position, {duration: 0.6, ...params[direction].to, ease: "expo.in"}, 0)
-      .to(this.cube.position, {duration: 0.6, ...params[direction].to, ease: "expo.in"}, 0)
+      .to(this.camera.position, {duration: 0.6, ...params[direction].to, ease: "power2.in"}, 0)
+      .to(this.cube.position, {duration: 0.6, ...params[direction].to, ease: "power2.in"}, 0)
 
     this.tweenAnimatingObjects(this.tl, animatingObjectsMaterial, 'leave');
+
+    // Fade in black overlay during page transition
+    if (this.props.overlayRef && this.props.overlayRef.current) {
+      this.tl.to(this.props.overlayRef.current, {duration: 0.6, opacity: 1, ease: "power2.in"}, 0);
+    }
   }
 
   appearTop     = (to) => this.appearTweens('top', to);

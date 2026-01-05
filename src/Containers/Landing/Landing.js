@@ -120,6 +120,11 @@ class Landing extends Component {
   onCompleteHandlerLeave = () => {
     this.props.animationCallback && this.props.animationCallback();
     this._isMounted && this.setState({ animating: false });
+    // Navigate AFTER animation completes
+    if (this._pendingNavigation) {
+      this.props.navigate(this._pendingNavigation);
+      this._pendingNavigation = null;
+    }
   }
   
   // If component arrive anim finished...
@@ -149,8 +154,14 @@ class Landing extends Component {
   changeToPortfolioHandler = (e) => {
     this.routeChangeHandler(e, 'portfolio');
     if(!this.routeChangedScrolling) {
-      this.props.navigate('/portfolio');
+      // Store pending navigation - will navigate AFTER animation completes
+      this._pendingNavigation = '/portfolio';
       this.routeChangedScrolling = true;
+      // Start the leave animation manually
+      this.setState({ animating: true }, () => {
+        this.leaveTop();
+        this.removeMouseMove();
+      });
     }
   }
 
@@ -219,9 +230,9 @@ class Landing extends Component {
     this.createNewTimeline('leave');
     const params = {
       top: {
-        logo:   {y: -600, autoAlpha: 0.4},
-        main:   {y: -500, autoAlpha: 0},
-        second: {y: -400,  autoAlpha: 0}
+        logo:   {y: -600, autoAlpha: 1},
+        main:   {y: -500, autoAlpha: 1},
+        second: {y: -400, autoAlpha: 1}
       },
       out: {
         logo:   {z: 200, autoAlpha: 0},
@@ -235,9 +246,9 @@ class Landing extends Component {
 
     this.tl
       .to(this.landingEl, {duration: 0.6, rotationX: 0, rotationY: 0}, 'landing')
-      .to(this.logoEl, {duration: 0.6, ...params[direction].logo, ease: "expo.in", overwrite: 'auto'}, 'landing')
-      .to(this.mainChildren, {duration: 0.6, ...params[direction].main, ease: "expo.in", overwrite: 'auto', stagger: 0.01}, 0)
-      .to(this.secondaryChildren, {duration: 0.6, ...params[direction].second, ease: "expo.in", overwrite: 'auto', stagger: 0.01}, 0)
+      .to(this.logoEl, {duration: 0.6, ...params[direction].logo, ease: "power2.in", overwrite: 'auto'}, 'landing')
+      .to(this.mainChildren, {duration: 0.6, ...params[direction].main, ease: "power2.in", overwrite: 'auto', stagger: 0.01}, 0)
+      .to(this.secondaryChildren, {duration: 0.6, ...params[direction].second, ease: "power2.in", overwrite: 'auto', stagger: 0.01}, 0)
       .to(this.landingBtnEl, {duration: 0.65, autoAlpha: 0, ease: "power1.out", overwrite: 'auto'}, 'landing+=0.1');
   }
 
