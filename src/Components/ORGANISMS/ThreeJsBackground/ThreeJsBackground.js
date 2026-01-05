@@ -137,8 +137,18 @@ class ThreeJsBackground extends Component {
             }
           });
           // If the sphere is tweening, keep updating the end value
-        } else if (this.sphereIsTweening) {
-          this.sphereTween.updateTo({value: 2 * Math.sin(this.sphere.rotation.y * 0.125)}, false);
+        } else if (this.sphereIsTweening && this.sphereTween) {
+          // GSAP 3 doesn't have updateTo - kill and recreate the tween
+          const currentProgress = this.sphereTween.progress();
+          this.sphereTween.kill();
+          this.sphereTween = gsap.to(amplitude, {
+            duration: 3 * (1 - currentProgress),
+            value: 2 * Math.sin(this.sphere.rotation.y * 0.125),
+            onComplete: () => {
+              this.sphereAnimSmooth = true;
+              this.sphereIsTweening = false;
+            }
+          });
         } 
         
         // If the sphere is tweened and at its normal state...
