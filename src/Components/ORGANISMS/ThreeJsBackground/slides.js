@@ -108,7 +108,7 @@ export default {
             "A1-The__MovieDB__API.svg",
           ]
         },
-        "projectUrl": "https://www.filmbase.xyz/",
+        "projectUrl": "https://filmbase.cc/",
         "codeUrl": "https://github.com/mikec-git/FilmBase-React-App"
       },
       "shapes": [
@@ -165,7 +165,6 @@ export default {
             "A2-Mapbox__API.svg"
           ]
         },
-        "projectUrl": "https://yelpcampnodeapp.herokuapp.com/",
         "codeUrl": "https://github.com/mikec-git/YelpCamp"
       },
       "shapes": [
