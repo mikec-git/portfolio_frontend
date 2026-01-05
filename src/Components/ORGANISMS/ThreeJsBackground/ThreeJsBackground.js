@@ -645,17 +645,14 @@ class ThreeJsBackground extends Component {
     let xCamPos = (yRatio*Math.PI*0.5).toFixed(4);
     let yCamPos = (-xRatio*Math.PI*0.5).toFixed(4);
 
-    // If the current page doesnt have bg noise particles...
-    if(!this._hasNoiseBg) {
-      // Move around bg following the mouse
-      if(!this.projectIsMouseScrollSliding) {
-        gsap.killTweensOf(this.camera.position, "x");
-        gsap.to(this.camera.position, {duration: 0.75, x: xCamPos});
-      }
-
-      gsap.killTweensOf(this.camera.position, "y");
-      gsap.to(this.camera.position, {duration: 0.75, y: yCamPos});
+    // Move camera following gyroscope
+    if(!this.projectIsMouseScrollSliding) {
+      gsap.killTweensOf(this.camera.position, "x");
+      gsap.to(this.camera.position, {duration: 0.75, x: xCamPos});
     }
+
+    gsap.killTweensOf(this.camera.position, "y");
+    gsap.to(this.camera.position, {duration: 0.75, y: yCamPos});
   }
 
   // Mouse move handler...
@@ -667,17 +664,14 @@ class ThreeJsBackground extends Component {
       let xCamPos = (-xNormalized*Math.PI*0.65).toFixed(2);
       let yCamPos = (-yNormalized*Math.PI*0.65).toFixed(2);
 
-      // If the current page doesnt have bg noise particles...
-      if(!this._hasNoiseBg) {
-        // Move around bg following the mouse
-        if(!this.projectIsMouseScrollSliding) {
-          gsap.killTweensOf(this.camera.position, "x");
-          gsap.to(this.camera.position, {duration: 1.5, x: xCamPos});
-        }
-
-        gsap.killTweensOf(this.camera.position, "y");
-        gsap.to(this.camera.position, {duration: 1.5, y: yCamPos});
+      // Move camera following the mouse
+      if(!this.projectIsMouseScrollSliding) {
+        gsap.killTweensOf(this.camera.position, "x");
+        gsap.to(this.camera.position, {duration: 1.5, x: xCamPos});
       }
+
+      gsap.killTweensOf(this.camera.position, "y");
+      gsap.to(this.camera.position, {duration: 1.5, y: yCamPos});
 
       // If nav is closed...
       if(!this.props.navIsOpen) {

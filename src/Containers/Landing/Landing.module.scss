@@ -3,11 +3,13 @@
   height: 100vh;
   height: calc(var(--vh, 1vh) * 100);
   width: 100%;
-  transform-style: preserve-3d;   
+  transform-style: preserve-3d;
   transform: translateZ(0);
+  perspective: 80rem;
   
   &__Details {
     height: 100%;
     width: 100%;
+    transform-style: preserve-3d;
   }
 }
