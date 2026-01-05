@@ -362,7 +362,13 @@ class ThreeJsBackground extends Component {
     this.tl && this.tl.kill();
     this.noiseTl && this.noiseTl.clear();
     this.bgAnimating = true;
-    
+
+    // Kill any scroll-related camera animations to prevent conflicts
+    gsap.killTweensOf(this.camera.position, "x");
+    gsap.killTweensOf(this.cube.position, "x");
+    this.projectIsMouseScrollSliding = false;
+    this._lastScrollTarget = undefined;
+
     // If scene is zoomed out...
     if(this._zoomedOut) {
       const leaveAnim = this.props.routeAnim.leave;
@@ -545,11 +551,12 @@ class ThreeJsBackground extends Component {
   leaveOut      = (from) => this.leaveTweens('out', from);
 
   // Called when bg has fully arrived into scene...
-  slideArrivedHandler = () => {  
+  slideArrivedHandler = () => {
     this.bgAnimating = false;
     this.addMouseMove();
     this.props.toggleRouteIsSliding(false);
     this.projectIsMouseScrollSliding = false;
+    this._lastScrollTarget = 0;
   }
 
   // Runs once page has left scene, initializes the arrival animation
@@ -570,11 +577,14 @@ class ThreeJsBackground extends Component {
   // END - ALL TRANSITION ANIMATIONS
 
   onMouseWheel = () => {
-    // If route is changing, set mouse scroll to 0
-    const scrollAmount = this.props._isSliding ? 0 : this.props.scrollAmount;
+    // If route is changing, skip scroll handling
+    if(this.props._isSliding) {
+      return;
+    }
 
-    // If current page is still portfolio and slide isn't moving...
-    if(this.props.page[0] === 'portfolio' && !this.props._isSliding) {
+    // If current page is portfolio...
+    if(this.props.page[0] === 'portfolio') {
+      const scrollAmount = this.props.scrollAmount;
       const oldScrollAmount = scrollAmount/1.3;
       // Some funky math, just from playing around with numbers
       let newScrollAmount   = +(oldScrollAmount - oldScrollAmount/100).toFixed(4);
@@ -585,14 +595,21 @@ class ThreeJsBackground extends Component {
         this.projectIsMouseScrollSliding = false;
         newScrollAmount = 0;
       }
-      
-      // If the new scroll amount is different...
-      if(oldScrollAmount !== newScrollAmount) {
+
+      // Only start new animation if target position changed
+      const targetChanged = this._lastScrollTarget !== newScrollAmount;
+
+      if(targetChanged) {
+        this._lastScrollTarget = newScrollAmount;
+
         // Change scrolled amount to new amount
         this.props.changeScroll(newScrollAmount);
-        this.projectIsMouseScrollSliding = true;
 
-        // Slide horizontally by new scroll amount
+        if(newScrollAmount !== 0) {
+          this.projectIsMouseScrollSliding = true;
+        }
+
+        // Slide horizontally to target scroll position
         gsap.killTweensOf(this.camera.position, "x");
         gsap.killTweensOf(this.cube.position, "x");
         gsap.to(this.camera.position, {duration: 0.5, x: newScrollAmount, ease: "power1.out"});
