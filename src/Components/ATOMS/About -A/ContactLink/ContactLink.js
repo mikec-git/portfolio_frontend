@@ -13,12 +13,6 @@ const contactLink = (props) => {
     url = 'https://github.com/mikec-git';
   } else if(linkType === 'LinkedIn') {
     url = 'https://www.linkedin.com/in/choi-mike/';
-  } else if(linkType === 'CodePen') {
-    url = 'https://codepen.io/mikec-git/';
-  } else if(linkType === 'Email') {
-    url = 'mailto:mike.choi.h@gmail.com?subject=Re: Message from portfolio!';
-    target = null;
-    rel = null;
   }
 
   let link = (
